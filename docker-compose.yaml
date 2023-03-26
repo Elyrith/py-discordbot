@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  discordbot:
+    build: .
+    container_name: discordbot
+    restart: unless-stopped

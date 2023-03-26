@@ -1,0 +1,6 @@
+discord.py
+aiohttp
+click
+process_uptime
+requests
+openai
