@@ -1,4 +1,4 @@
-# DiscordBot - A simple, working Discord bot.
+# DiscordBot - A simple, working Discord bot
 
 #### You will need either:
 1. Python and Pip installed on your computer, or
