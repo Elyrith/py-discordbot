@@ -2,8 +2,9 @@
 # Loudfoot bot: cogs/chatgpt.py
 
 from discord.ext import commands
-import config
 import openai
+
+import config
 
 class ChatGPTCog(commands.Cog):
     def __init__(self, bot, openai_api_token):

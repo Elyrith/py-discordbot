@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 # Discord bot: bot.py
 
-from discord.ext import commands
-import discord
-import config
 import logging
+
+import discord
+from discord.ext import commands
 import aiohttp
+
+import config
 
 description = """
 Hello! I am DiscordBot.

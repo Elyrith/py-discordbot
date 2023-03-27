@@ -2,8 +2,9 @@
 # Loudfoot bot: cogs/thecatapi.py
 
 from discord.ext import commands
-import config
 import requests
+
+import config
 
 class TheCatAPI(commands.Cog):
     """TheCatAPI stuff."""

@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 # Discord bot: launcher.py
 
+import logging
+import contextlib
+from logging.handlers import RotatingFileHandler
+import asyncio
+
 import discord
 import click
-import logging
-import asyncio
-import contextlib
+
 from bot import DiscordBot
-from logging.handlers import RotatingFileHandler
 
 class RemoveNoise(logging.Filter):
     def __init__(self):
