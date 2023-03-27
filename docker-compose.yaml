@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  discordbot:
+  py-discordbot:
     build: .
-    container_name: discordbot
+    container_name: py-discordbot
     restart: unless-stopped
