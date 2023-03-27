@@ -6,7 +6,7 @@ import openai
 
 import config
 
-class ChatGPTCog(commands.Cog):
+class ChatGPT(commands.Cog):
     def __init__(self, bot, openai_api_token):
         self.bot = bot
         openai.api_key = openai_api_token
@@ -31,4 +31,4 @@ class ChatGPTCog(commands.Cog):
             await ctx.reply(text)
 
 async def setup(bot):
-    await bot.add_cog(ChatGPTCog(bot, config.openai_api_token))
+    await bot.add_cog(ChatGPT(bot, config.openai_api_token))
