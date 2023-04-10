@@ -70,7 +70,6 @@ class DiscordBot(commands.AutoShardedBot):
 
     async def on_shard_resumed(self, shard_id: int):
         log.info('Shard ID %s has resumed...', shard_id)
-        self.resumes[shard_id].append(discord.utils.utcnow())
 
     async def on_message(self, message: discord.Message) -> None:
         if message.author.bot:
