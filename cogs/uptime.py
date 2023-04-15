@@ -17,8 +17,8 @@ class Uptime(commands.Cog):
         try:
             uptime = getuptime()
             uptimeDays = int(uptime // 60 // 60 // 24)
-            uptimeHours = int(uptime // 60 // 60)
-            uptimeMinutes = int((uptime % 3600) // 60)
+            uptimeHours = (uptime // 60 // 60) % 24
+            uptimeMinutes = (uptime // 60) % 60
             uptimeSeconds = uptime % 60
             await ctx.reply("Uptime: " + str(uptimeDays) + "d " + str(uptimeHours) + "h " + str(uptimeMinutes) + "m " + str(uptimeSeconds) + "s. \N{OK HAND SIGN}")
         except commands.ExtensionError as e:
