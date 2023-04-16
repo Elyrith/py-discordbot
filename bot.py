@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 initial_extensions = (
     'cogs.admin',
     'cogs.uptime',
-    'cogs.thecatapi'
+    'cogs.thecatapi',
 )
 
 class DiscordBot(commands.AutoShardedBot):
@@ -38,6 +38,7 @@ class DiscordBot(commands.AutoShardedBot):
             allowed_mentions=allowed_mentions,
             intents=intents,
             enable_debug_events=True,
+            activity=discord.Activity(type=discord.ActivityType.listening, name="server fans"),
         )
 
     async def setup_hook(self) -> None:
@@ -59,9 +60,10 @@ class DiscordBot(commands.AutoShardedBot):
     async def on_ready(self) -> None:
         if not hasattr(self, 'uptime'):
             self.uptime = discord.utils.utcnow()
+            self.tree.clear_commands(guild=discord.Object(id=config.admin_guild))
             self.tree.copy_global_to(guild=discord.Object(id=config.admin_guild))
             await self.tree.sync(guild=discord.Object(id=config.admin_guild))
-            await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="server fans"))
+#            await self.tree.sync()
 
         log.info('Ready: %s (ID: %s)', self.user, self.user.id)
 
