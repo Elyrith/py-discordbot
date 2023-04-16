@@ -21,7 +21,7 @@ class AdminCog(commands.Cog):
         """Loads a module."""
         try:
             await self.bot.load_extension(module)
-            await ctx.response.send_message("Module {module} loaded successfully. 👌")
+            await ctx.response.send_message(f"Module {module} loaded successfully. 👌")
         except commands.ExtensionError as e:
             await ctx.response.send_message(f'{e.__class__.__name__}: {e}')
 
@@ -30,7 +30,7 @@ class AdminCog(commands.Cog):
         """Unloads a module."""
         try:
             await self.bot.unload_extension(module)
-            await ctx.response.send_message("Module {module} unloaded successfully. 👌")
+            await ctx.response.send_message(f"Module {module} unloaded successfully. 👌")
         except commands.ExtensionError as e:
             await ctx.response.send_message(f'{e.__class__.__name__}: {e}')
 
@@ -39,12 +39,12 @@ class AdminCog(commands.Cog):
         """Reloads a module, or loads it if it's not loaded."""
         try:
             await self.bot.reload_extension(module)
-            await ctx.response.send_message("Module {module} reloaded successfully. 👌")
+            await ctx.response.send_message(f"Module {module} reloaded successfully. 👌")
             return
         except commands.ExtensionError as e:
             try:
                 await self.bot.load_extension(module)
-                await ctx.response.send_message("Module {module} reloaded successfully. 👌")
+                await ctx.response.send_message(f"Module {module} reloaded successfully. 👌")
             except commands.ExtensionError as e:
                 await ctx.response.send_message(f'{e.__class__.__name__}: {e}')
 
@@ -82,13 +82,32 @@ class AdminCog(commands.Cog):
     async def resync(self, ctx) -> None:
         """Resync all app_commands."""
         try:
+            # Clear all commands first
             self.bot.tree.clear_commands(guild=discord.Object(id=config.admin_guild))
+            await self.bot.tree.sync(guild=discord.Object(id=config.admin_guild))
+
+            # Copy all global commands to guild commands and re-
             self.bot.tree.copy_global_to(guild=discord.Object(id=config.admin_guild))
             await self.bot.tree.sync(guild=discord.Object(id=config.admin_guild))
+#            await self.bot.tree.sync()
+
+            await ctx.response.send_message("Resync successful. Actual update may take time. 👌")
         except Exception as e:
             await ctx.response.send_message(f"Failed to resync: {e}")
             return
-        await ctx.response.send_message("Resync successful. Actual update may take time. 👌")
+
+    # Don't use this too much. There is rate-limiting on it and you will have issues.
+    @app_commands.command(name="clear_commands", description="Clear all app_commands")
+    async def resync(self, ctx) -> None:
+        """Clear all app_commands."""
+        try:
+            self.bot.tree.clear_commands(guild=discord.Object(id=config.admin_guild))
+            await self.bot.tree.sync(guild=discord.Object(id=config.admin_guild))
+#            await self.tree.sync()
+            await ctx.response.send_message("Command clear successful. Actual update may take time. 👌")
+        except Exception as e:
+            await ctx.response.send_message(f"Failed to clear commands: {e}")
+            return
 
 async def setup(bot) -> None:
     await bot.add_cog(AdminCog(bot))
