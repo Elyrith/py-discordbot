@@ -3,11 +3,9 @@
 
 # Note: Remember to use "cogs.<cogname>" when using load/unload/reload. Example: "!reload cogs.admin"
 
-from typing import Literal, Optional
 import discord
 from discord.ext import commands
 from discord import app_commands
-from naff import Greedy
 
 import config
 
