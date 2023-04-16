@@ -21,9 +21,9 @@ class UptimeCog(commands.Cog):
             uptimeHours = (uptime // 60 // 60) % 24
             uptimeMinutes = (uptime // 60) % 60
             uptimeSeconds = uptime % 60
-            await ctx.reply("Uptime: " + str(uptimeDays) + "d " + str(uptimeHours) + "h " + str(uptimeMinutes) + "m " + str(uptimeSeconds) + "s. \N{OK HAND SIGN}")
+            await ctx.response.send_message("Uptime: " + str(uptimeDays) + "d " + str(uptimeHours) + "h " + str(uptimeMinutes) + "m " + str(uptimeSeconds) + "s. \N{OK HAND SIGN}")
         except commands.ExtensionError as e:
-            await ctx.reply(f'{e.__class__.__name__}: {e}')
+            await ctx.response.send_message(f'{e.__class__.__name__}: {e}')
 
 async def setup(bot):
     await bot.add_cog(UptimeCog(bot))
