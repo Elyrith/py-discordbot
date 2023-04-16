@@ -2,17 +2,18 @@
 # Discord bot: cogs/uptime.py
 
 from discord.ext import commands
+from discord import app_commands
 from process_uptime import getuptime
 
-class Uptime(commands.Cog):
+class UptimeCog(commands.Cog):
     """Uptime command."""
 
     def __init__(self, bot):
         self.bot = bot
         self.sessions: set[int] = set()
 
-    @commands.command(hidden=False)
-    async def uptime(self, ctx):
+    @app_commands.command(name="uptime", description="Prints the bot uptime")
+    async def uptime(self, ctx) -> None:
         """Prints the bot uptime."""
         try:
             uptime = getuptime()
@@ -25,4 +26,4 @@ class Uptime(commands.Cog):
             await ctx.reply(f'{e.__class__.__name__}: {e}')
 
 async def setup(bot):
-    await bot.add_cog(Uptime(bot))
+    await bot.add_cog(UptimeCog(bot))

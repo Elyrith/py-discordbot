@@ -2,19 +2,21 @@
 # Loudfoot bot: cogs/chatgpt.py
 
 from discord.ext import commands
+from discord import app_commands
 import openai
 
 import config
 
-class ChatGPT(commands.Cog):
-    def __init__(self, bot, openai_api_token):
+class ChatGPTCog(commands.Cog):
+    def __init__(self, bot, openai_api_token) -> None:
         self.bot = bot
         openai.api_key = openai_api_token
 
-    @commands.command()
-    async def gpt(self, ctx, *, prompt):
+    @app_commands.command(name="gpt", description="Access ChatGPT")
+    async def gpt(self, ctx, *, prompt) -> None:
+        """Access ChatGPT."""
         if not openai.api_key:
-            await ctx.reply('The config file does not have a value for openai_api_token.')
+            await ctx.response.send_message('The config file does not have a value for openai_api_token.')
             return
 
         response = openai.Completion.create(
@@ -26,9 +28,9 @@ class ChatGPT(commands.Cog):
 
         # Check if the response is empty or contains an error message
         if not text or text.startswith("Error:"):
-            await ctx.reply("I'm sorry, I could not generate a response.")
+            await ctx.response.send_message("I'm sorry, I could not generate a response.")
         else:
-            await ctx.reply(text)
+            await ctx.response.send_message(text)
 
-async def setup(bot):
-    await bot.add_cog(ChatGPT(bot, config.openai_api_token))
+async def setup(bot) -> None:
+    await bot.add_cog(ChatGPTCog(bot, config.openai_api_token))

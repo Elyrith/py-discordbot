@@ -17,6 +17,7 @@
 1. It pulls the configuration variables (like Discord bot client ID and token) so they can be kept secret and out of the Git repository\
 1. It introduces cogs to let you make little modules that can be easily added, removed, and reloaded (when changed) without restarting the entire bot
 1. It has a test cog you can use to make your own. Copy it, rename it, and enjoy!
+1. It uses [Discord's slash commands](https://discord.com/blog/slash-commands-are-here)
 
 ---
 

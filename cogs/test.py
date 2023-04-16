@@ -2,20 +2,19 @@
 # Discord bot: cogs/test.py
 
 from discord.ext import commands
+from discord import app_commands
 
-class Test(commands.Cog):
+class TestCog(commands.Cog):
     """Various test commands."""
 
     # You can replace the await ctx.reply('Test successful') with your own stuff. (Replace the description in """ too.)
-    @commands.command(hidden=True)
+    @app_commands.command(name="test", description="Test command")
     async def test(self, ctx):
         """Test command."""
-        await ctx.message.add_reaction("👍")
         try:
-            await ctx.reply('Test successful')
-            await ctx.message.add_reaction("👌")
+            await ctx.response.send_message('Test successful 👌')
         except Exception as e:
-            await ctx.reply(f"Command failed.")
+            await ctx.response.send_message(f"Command failed.")
 
-async def setup(bot):
-    await bot.add_cog(Test(bot))
+async def setup(bot) -> None:
+    await bot.add_cog(TestCog(bot))

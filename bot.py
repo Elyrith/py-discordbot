@@ -25,14 +25,9 @@ class DiscordBot(commands.AutoShardedBot):
     user: discord.ClientUser
     bot_app_info: discord.AppInfo
 
-    def __init__(self):
+    def __init__(self) -> None:
         allowed_mentions = discord.AllowedMentions(roles=False, everyone=False, users=True)
-        intents = discord.Intents(
-            guilds=True,
-            members=False,
-            messages=True,
-            message_content=True,
-        )
+        intents = discord.Intents.default()
         super().__init__(
             command_prefix='!',
             description=description,
@@ -61,14 +56,16 @@ class DiscordBot(commands.AutoShardedBot):
     def owner(self) -> discord.User:
         return self.bot_app_info.owner
 
-    async def on_ready(self):
+    async def on_ready(self) -> None:
         if not hasattr(self, 'uptime'):
             self.uptime = discord.utils.utcnow()
+            self.tree.copy_global_to(guild=discord.Object(id=config.admin_guild))
+            await self.tree.sync(guild=discord.Object(id=config.admin_guild))
             await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="server fans"))
 
         log.info('Ready: %s (ID: %s)', self.user, self.user.id)
 
-    async def on_shard_resumed(self, shard_id: int):
+    async def on_shard_resumed(self, shard_id: int) -> None:
         log.info('Shard ID %s has resumed...', shard_id)
 
     async def on_message(self, message: discord.Message) -> None:
@@ -84,5 +81,5 @@ class DiscordBot(commands.AutoShardedBot):
         await super().start(config.discordbot_token, reconnect=True)
 
     @property
-    def config(self):
+    def config(self) -> None:
         return __import__('config')

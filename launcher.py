@@ -12,7 +12,7 @@ import click
 from bot import DiscordBot
 
 class RemoveNoise(logging.Filter):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(name='discord.state')
 
     def filter(self, record: logging.LogRecord) -> bool:
@@ -21,7 +21,7 @@ class RemoveNoise(logging.Filter):
         return True
 
 @contextlib.contextmanager
-def setup_logging():
+def setup_logging() -> None:
     log = logging.getLogger()
 
     try:
@@ -54,7 +54,7 @@ async def run_bot():
 
 @click.group(invoke_without_command=True, options_metavar='[options]')
 @click.pass_context
-def main(ctx):
+def main(ctx) -> None:
     """Launches the bot."""
     if ctx.invoked_subcommand is None:
         with setup_logging():
