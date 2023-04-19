@@ -2,8 +2,8 @@
 # Discord bot: launcher.py
 
 import logging
-import contextlib
 from logging.handlers import RotatingFileHandler
+import contextlib
 import asyncio
 
 import discord
