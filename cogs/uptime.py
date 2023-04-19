@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 # Discord bot: cogs/uptime.py
 
+import discord
 from discord.ext import commands
 from discord import app_commands
 from process_uptime import getuptime
+
+from config import admin_guild
 
 class UptimeCog(commands.Cog):
     """Uptime command."""
@@ -12,8 +15,9 @@ class UptimeCog(commands.Cog):
         self.bot = bot
         self.sessions: set[int] = set()
 
-    @app_commands.command(name="uptime", description="Prints the bot uptime")
-    async def uptime(self, ctx) -> None:
+    @app_commands.command()
+    @app_commands.guilds(discord.Object(id=admin_guild))
+    async def uptime(self, ctx: commands.Context) -> None:
         """Prints the bot uptime."""
         try:
             uptime = getuptime()

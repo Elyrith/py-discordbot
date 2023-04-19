@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Loudfoot bot: cogs/thecatapi.py
 
+import discord
 from discord.ext import commands
 from discord import app_commands
 import requests
@@ -14,8 +15,8 @@ class TheCatAPICog(commands.Cog):
         self.bot = bot
         self.thecatapi_token = thecatapi_token
 
-    @app_commands.command(name="gimmeacat", description="Gets and shows a cat photo")
-    async def gimmeacat(self, ctx) -> None:
+    @app_commands.command()
+    async def gimmeacat(self, ctx: commands.Context) -> None:
         """Gets and shows a cat photo."""
 
         # Check if the token is found

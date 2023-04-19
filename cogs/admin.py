@@ -7,7 +7,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-import config
+from config import admin_guild
 
 class AdminCog(commands.Cog):
     """Admin-only commands that make the bot dynamic."""
@@ -16,97 +16,110 @@ class AdminCog(commands.Cog):
         self.bot = bot
         self.sessions: set[int] = set()
 
-    @app_commands.command(name="load", description="Loads a module")
-    async def load(self, ctx, *, module: str) -> None:
-        """Loads a module."""
+    @app_commands.command()
+    @app_commands.guilds(discord.Object(id=admin_guild))
+    async def load(self, ctx: commands.Context, *, cog: str) -> None:
+        """Loads a cog."""
         try:
-            await self.bot.load_extension(module)
-            await ctx.response.send_message(f"Module {module} loaded successfully. 👌")
+            await self.bot.load_extension(cog)
+            await ctx.response.send_message(f"Cog {cog} **loaded** successfully. 👌")
+        except commands.ExtensionNotFound as e:
+            await ctx.response.send_message(f"Cog {cog} __not found__. 👎")
         except commands.ExtensionError as e:
-            await ctx.response.send_message(f'{e.__class__.__name__}: {e}')
+            await ctx.response.send_message(f'{e.__class__.__name__}: {e}', ephemeral=True)
 
-    @app_commands.command(name="unload", description="Unloads a module")
-    async def unload(self, ctx, *, module: str) -> None:
-        """Unloads a module."""
+    @app_commands.command()
+    @app_commands.guilds(discord.Object(id=admin_guild))
+    async def unload(self, ctx: commands.Context, *, cog: str) -> None:
+        """Unloads a cog."""
         try:
-            await self.bot.unload_extension(module)
-            await ctx.response.send_message(f"Module {module} unloaded successfully. 👌")
+            await self.bot.unload_extension(cog)
+            await ctx.response.send_message(f"Cog {cog} **unloaded** successfully. 👌")
         except commands.ExtensionError as e:
-            await ctx.response.send_message(f'{e.__class__.__name__}: {e}')
+            await ctx.response.send_message(f'{e.__class__.__name__}: {e}', ephemeral=True)
 
-    @app_commands.command(name="reload", description="Reloads a module, or loads it if it's not loaded")
-    async def reload(self, ctx, *, module: str) -> None:
-        """Reloads a module, or loads it if it's not loaded."""
+    @app_commands.command()
+    @app_commands.guilds(discord.Object(id=admin_guild))
+    async def reload(self, ctx: commands.Context, *, cog: str) -> None:
+        """Reloads a cog, or loads it if it's not loaded."""
         try:
-            await self.bot.reload_extension(module)
-            await ctx.response.send_message(f"Module {module} reloaded successfully. 👌")
+            await self.bot.load_extension(cog)
+            await ctx.response.send_message(f"Cog {cog} __loaded__ successfully. 👌")
             return
-        except commands.ExtensionError as e:
-            try:
-                await self.bot.load_extension(module)
-                await ctx.response.send_message(f"Module {module} reloaded successfully. 👌")
-            except commands.ExtensionError as e:
-                await ctx.response.send_message(f'{e.__class__.__name__}: {e}')
-
-    async def reload_or_load_extension(self, module: str) -> None:
-        try:
-            await self.bot.reload_extension(module)
-        except commands.ExtensionNotLoaded:
-            await self.bot.load_extension(module)
-
-    @app_commands.command(name="reload_all", description="Reloads all currently-loaded cogs")
-    @commands.is_owner()
-    async def reload_all(self, ctx) -> None:
-        """Reloads all currently-loaded cogs"""
-        loaded_cogs = list(self.bot.extensions.keys())
-        for cog in loaded_cogs:
+        except commands.ExtensionAlreadyLoaded as e:
             try:
                 await self.bot.reload_extension(cog)
-                return
-            except Exception as e:
-                await ctx.response.send_message(f"Failed to reload {cog}: {e}")
-        await ctx.response.send_message("Modules reloaded successfully. 👌")
+                await ctx.response.send_message(f"Cog {cog} **reloaded** successfully. 👌")
+            except commands.ExtensionError as e:
+                await ctx.response.send_message(f'{e.__class__.__name__}: {e}', ephemeral=True)
+        except commands.ExtensionError as e:
+            await ctx.response.send_message(f'{e.__class__.__name__}: {e}', ephemeral=True)
 
-    @app_commands.command(name="stop", description="Stop the bot")
+    async def reload_or_load_extension(self, cog: str) -> None:
+        try:
+            await self.bot.reload_extension(cog)
+        except commands.ExtensionNotLoaded:
+            await self.bot.load_extension(cog)
+
+    @app_commands.command()
+    @app_commands.guilds(discord.Object(id=admin_guild))
     @commands.is_owner()
-    async def stop(self, ctx) -> None:
+    async def reload_all(self, ctx: commands.Context) -> None:
+        """Reloads all currently-loaded cogs"""
+        try:
+            loaded_cogs = list(self.bot.extensions.keys())
+            for cog in loaded_cogs:
+                try:
+                    await self.bot.reload_extension(cog)
+                except Exception as e:
+                    await ctx.response.send_message(f"Failed to reload {cog}: {e}", ephemeral=True)
+            await ctx.response.send_message("Cogs reloaded successfully. 👌")
+            await self.bot.tree.sync()
+        except Exception as e:
+            await ctx.response.send_message(f"Failed to reload all cogs: {e}", ephemeral=True)
+
+    @app_commands.command()
+    @app_commands.guilds(discord.Object(id=admin_guild))
+    @commands.is_owner()
+    async def stop(self, ctx: commands.Context) -> None:
         """Stop the bot."""
         try:
-            await ctx.response.send_message("👍")
+            await ctx.response.send_message("👍", ephemeral=True)
             await self.bot.close()
         except:
-            await ctx.response.send_message(f"Unable to stop the bot for some reason.")
+            await ctx.response.send_message(f"Unable to stop the bot for some reason.", ephemeral=True)
 
     # Don't use this too much. There is rate-limiting on it and you will have issues.
-    @app_commands.command(name="resync", description="Resync all app_commands")
-    async def resync(self, ctx) -> None:
-        """Resync all app_commands."""
+    @app_commands.command()
+    @app_commands.guilds(discord.Object(id=admin_guild))
+    @commands.is_owner()
+    async def resync(self, ctx: commands.Context) -> None:
+        """Resync all slash commands."""
         try:
-            # Clear all commands first
-            self.bot.tree.clear_commands(guild=discord.Object(id=config.admin_guild))
-            await self.bot.tree.sync(guild=discord.Object(id=config.admin_guild))
-
-            # Copy all global commands to guild commands and re-
-            self.bot.tree.copy_global_to(guild=discord.Object(id=config.admin_guild))
-            await self.bot.tree.sync(guild=discord.Object(id=config.admin_guild))
-#            await self.bot.tree.sync()
-
-            await ctx.response.send_message("Resync successful. Actual update may take time. 👌")
+            await self.bot.tree.sync()
+            await ctx.response.send_message("Resync successful. Actual update may take up to an hour. 👌")
         except Exception as e:
-            await ctx.response.send_message(f"Failed to resync: {e}")
+            await ctx.response.send_message(f"Failed to resync: {e}", ephemeral=True)
             return
 
     # Don't use this too much. There is rate-limiting on it and you will have issues.
-    @app_commands.command(name="clear_commands", description="Clear all app_commands")
-    async def resync(self, ctx) -> None:
+    @app_commands.command()
+    @app_commands.guilds(discord.Object(id=admin_guild))
+    @commands.is_owner()
+    async def resync(self, ctx: commands.Context) -> None:
         """Clear all app_commands."""
         try:
-            self.bot.tree.clear_commands(guild=discord.Object(id=config.admin_guild))
-            await self.bot.tree.sync(guild=discord.Object(id=config.admin_guild))
-#            await self.tree.sync()
-            await ctx.response.send_message("Command clear successful. Actual update may take time. 👌")
+            # Clear all guild commands
+#            self.bot.tree.clear_commands(guild=discord.Object(id=admin_guild))
+#            await self.bot.tree.sync(guild=discord.Object(id=admin_guild))
+
+            # Clear all global commands
+            self.bot.tree.clear_commands()
+            await self.bot.tree.sync()
+            
+            await ctx.response.send_message("Command clear successful. Actual update may take up to an hour. 👌")
         except Exception as e:
-            await ctx.response.send_message(f"Failed to clear commands: {e}")
+            await ctx.response.send_message(f"Failed to clear commands: {e}", ephemeral=True)
             return
 
 async def setup(bot) -> None:

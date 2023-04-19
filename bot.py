@@ -27,9 +27,14 @@ class DiscordBot(commands.AutoShardedBot):
 
     def __init__(self) -> None:
         allowed_mentions = discord.AllowedMentions(roles=False, everyone=False, users=True)
-        intents = discord.Intents.default()
+        intents = discord.Intents(
+            guilds=True,
+#            members=True,
+#            emojis=True,
+#            reactions=True,
+        )
         super().__init__(
-            command_prefix='!',
+            command_prefix='/',
             description=description,
             pm_help=None,
             help_attrs=dict(hidden=True),
@@ -37,8 +42,9 @@ class DiscordBot(commands.AutoShardedBot):
             heartbeat_timeout=150.0,
             allowed_mentions=allowed_mentions,
             intents=intents,
-            enable_debug_events=True,
+            enable_debug_events=False,
             activity=discord.Activity(type=discord.ActivityType.listening, name="server fans"),
+#            activity=discord.Activity(type=discord.CustomActivity, name="Bonking stuff."),
         )
 
     async def setup_hook(self) -> None:
@@ -53,6 +59,10 @@ class DiscordBot(commands.AutoShardedBot):
             except Exception as e:
                 log.exception('Failed to load extension %s.', extension)
 
+        # Add the list of all connected guilds to the log
+        for guild in self.guilds:
+            log.info('Connected to guild: %s (ID: %s)', guild, guild.id)
+
     @property
     def owner(self) -> discord.User:
         return self.bot_app_info.owner
@@ -60,10 +70,12 @@ class DiscordBot(commands.AutoShardedBot):
     async def on_ready(self) -> None:
         if not hasattr(self, 'uptime'):
             self.uptime = discord.utils.utcnow()
-            self.tree.clear_commands(guild=discord.Object(id=config.admin_guild))
-            self.tree.copy_global_to(guild=discord.Object(id=config.admin_guild))
+#            self.tree.clear_commands(guild=discord.Object(id=config.admin_guild))
+#            self.tree.copy_global_to(guild=discord.Object(id=config.admin_guild))
             await self.tree.sync(guild=discord.Object(id=config.admin_guild))
-#            await self.tree.sync()
+#            for guild in self.guilds:
+#                await self.tree.sync(guild=discord.Object(id=guild.id))
+            await self.tree.sync()
 
         log.info('Ready: %s (ID: %s)', self.user, self.user.id)
 
