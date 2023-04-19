@@ -106,8 +106,8 @@ class AdminCog(commands.Cog):
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=admin_guild))
     @commands.is_owner()
-    async def resync(self, ctx: commands.Context) -> None:
-        """Clear all app_commands."""
+    async def clear_commands(self, ctx: commands.Context) -> None:
+        """Clear all slash commands."""
         try:
             # Clear all guild commands
 #            self.bot.tree.clear_commands(guild=discord.Object(id=admin_guild))
