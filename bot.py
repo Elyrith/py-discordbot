@@ -44,7 +44,6 @@ class DiscordBot(commands.AutoShardedBot):
             intents=intents,
             enable_debug_events=False,
             activity=discord.Activity(type=discord.ActivityType.listening, name="server fans"),
-#            activity=discord.Activity(type=discord.CustomActivity, name="Bonking stuff."),
         )
 
     async def setup_hook(self) -> None:
