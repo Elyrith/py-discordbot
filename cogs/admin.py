@@ -22,9 +22,9 @@ class AdminCog(commands.Cog):
         """Loads a cog."""
         try:
             await self.bot.load_extension(cog)
-            await ctx.response.send_message(f"Cog {cog} **loaded** successfully. 👌")
+            await ctx.response.send_message(f"Cog {cog} **loaded** successfully. 👌", ephemeral=True)
         except commands.ExtensionNotFound as e:
-            await ctx.response.send_message(f"Cog {cog} __not found__. 👎")
+            await ctx.response.send_message(f"Cog {cog} __not found__. 👎", ephemeral=True)
         except commands.ExtensionError as e:
             await ctx.response.send_message(f'{e.__class__.__name__}: {e}', ephemeral=True)
 
@@ -34,7 +34,7 @@ class AdminCog(commands.Cog):
         """Unloads a cog."""
         try:
             await self.bot.unload_extension(cog)
-            await ctx.response.send_message(f"Cog {cog} **unloaded** successfully. 👌")
+            await ctx.response.send_message(f"Cog {cog} **unloaded** successfully. 👌", ephemeral=True)
         except commands.ExtensionError as e:
             await ctx.response.send_message(f'{e.__class__.__name__}: {e}', ephemeral=True)
 
@@ -44,12 +44,12 @@ class AdminCog(commands.Cog):
         """Reloads a cog, or loads it if it's not loaded."""
         try:
             await self.bot.load_extension(cog)
-            await ctx.response.send_message(f"Cog {cog} __loaded__ successfully. 👌")
+            await ctx.response.send_message(f"Cog {cog} __loaded__ successfully. 👌", ephemeral=True)
             return
         except commands.ExtensionAlreadyLoaded as e:
             try:
                 await self.bot.reload_extension(cog)
-                await ctx.response.send_message(f"Cog {cog} **reloaded** successfully. 👌")
+                await ctx.response.send_message(f"Cog {cog} **reloaded** successfully. 👌", ephemeral=True)
             except commands.ExtensionError as e:
                 await ctx.response.send_message(f'{e.__class__.__name__}: {e}', ephemeral=True)
         except commands.ExtensionError as e:
@@ -73,7 +73,7 @@ class AdminCog(commands.Cog):
                     await self.bot.reload_extension(cog)
                 except Exception as e:
                     await ctx.response.send_message(f"Failed to reload {cog}: {e}", ephemeral=True)
-            await ctx.response.send_message("Cogs reloaded successfully. 👌")
+            await ctx.response.send_message("Cogs reloaded successfully. 👌", ephemeral=True)
             await self.bot.tree.sync()
         except Exception as e:
             await ctx.response.send_message(f"Failed to reload all cogs: {e}", ephemeral=True)
@@ -94,10 +94,10 @@ class AdminCog(commands.Cog):
     @app_commands.guilds(discord.Object(id=admin_guild))
     @commands.is_owner()
     async def resync(self, ctx: commands.Context) -> None:
-        """Resync all slash commands."""
+        """Resync all slash commands. Rate-limited."""
         try:
             await self.bot.tree.sync()
-            await ctx.response.send_message("Resync successful. Actual update may take up to an hour. 👌")
+            await ctx.response.send_message("Resync successful. Actual update may take up to an hour. 👌", ephemeral=True)
         except Exception as e:
             await ctx.response.send_message(f"Failed to resync: {e}", ephemeral=True)
             return
@@ -107,17 +107,13 @@ class AdminCog(commands.Cog):
     @app_commands.guilds(discord.Object(id=admin_guild))
     @commands.is_owner()
     async def clear_commands(self, ctx: commands.Context) -> None:
-        """Clear all slash commands."""
+        """Clear all slash commands. Rate-limited."""
         try:
-            # Clear all guild commands
-#            self.bot.tree.clear_commands(guild=discord.Object(id=admin_guild))
-#            await self.bot.tree.sync(guild=discord.Object(id=admin_guild))
-
-            # Clear all global commands
+            # Clear and resync all commands
             self.bot.tree.clear_commands()
             await self.bot.tree.sync()
             
-            await ctx.response.send_message("Command clear successful. Actual update may take up to an hour. 👌")
+            await ctx.response.send_message("Command clear successful. Actual update may take up to an hour. 👌", ephemeral=True)
         except Exception as e:
             await ctx.response.send_message(f"Failed to clear commands: {e}", ephemeral=True)
             return
