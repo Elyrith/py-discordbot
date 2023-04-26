@@ -5,6 +5,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from process_uptime import getuptime
+import socket
 
 from config import admin_guild
 
@@ -14,6 +15,7 @@ class UptimeCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.sessions: set[int] = set()
+        self.hostname = socket.gethostname()
 
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=admin_guild))
@@ -25,7 +27,7 @@ class UptimeCog(commands.Cog):
             uptimeHours = (uptime // 60 // 60) % 24
             uptimeMinutes = (uptime // 60) % 60
             uptimeSeconds = uptime % 60
-            await ctx.response.send_message("Uptime: " + str(uptimeDays) + "d " + str(uptimeHours) + "h " + str(uptimeMinutes) + "m " + str(uptimeSeconds) + "s. \N{OK HAND SIGN}", ephemeral=True)
+            await ctx.response.send_message("Uptime: " + str(uptimeDays) + "d " + str(uptimeHours) + "h " + str(uptimeMinutes) + "m " + str(uptimeSeconds) + "s on " + self.hostname +". \N{OK HAND SIGN}", ephemeral=True)
         except commands.ExtensionError as e:
             await ctx.response.send_message(f'{e.__class__.__name__}: {e}', ephemeral=True)
 
