@@ -3,12 +3,12 @@
 
 FROM python:latest
 
-ADD ./requirements.txt /tmp/requirements.txt
-RUN pip install --user --no-cache-dir --no-warn-script-location -r /tmp/requirements.txt
-
 RUN useradd -u 1000 -m discordbot
 USER discordbot
 WORKDIR /home/discordbot
+
+ADD ./requirements.txt /tmp/requirements.txt
+RUN pip install --user --no-cache-dir --no-warn-script-location -r /tmp/requirements.txt
 
 COPY --chown=discordbot:discordbot . .
 
