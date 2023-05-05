@@ -33,7 +33,7 @@ def setup_logging() -> None:
         logging.getLogger('discord.state').addFilter(RemoveNoise())
 
         log.setLevel(logging.INFO)
-        handler = RotatingFileHandler(filename='DiscordBot.log', encoding='utf-8', mode='w', maxBytes=max_bytes, backupCount=5)
+        handler = RotatingFileHandler(filename='logs/DiscordBot.log', encoding='utf-8', mode='w', maxBytes=max_bytes, backupCount=5)
         dt_fmt = '%Y-%m-%d %H:%M:%S'
         fmt = logging.Formatter('[{asctime}] [{levelname:<7}] {name}: {message}', dt_fmt, style='{')
         handler.setFormatter(fmt)
