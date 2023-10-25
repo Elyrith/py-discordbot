@@ -1,7 +1,7 @@
 # Build this with: docker build -t discord-discordbot .
 # Or use the docker-compose file: docker-compose up -d
 
-FROM python:latest
+FROM python:3.11
 
 RUN useradd -u 1000 -m discordbot
 USER discordbot
