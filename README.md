@@ -1,4 +1,4 @@
-# DiscordBot - A simple, working Discord bot
+# DiscordBot - A simple Discord bot
 
 [![Python App](https://github.com/Elyrith/py-discordbot/actions/workflows/python-app.yml/badge.svg?branch=main)](https://github.com/Elyrith/py-discordbot/actions/workflows/python-app.yml)
 [![Docker Image CI](https://github.com/Elyrith/py-discordbot/actions/workflows/docker-image.yml/badge.svg?branch=main)](https://github.com/Elyrith/py-discordbot/actions/workflows/docker-image.yml)
