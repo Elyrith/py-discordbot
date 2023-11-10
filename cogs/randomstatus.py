@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 # Discord bot: cogs/random_status.py
 
-import discord
-from discord.ext import commands, tasks
-#from discord import app_commands   # TODO: Add a command to allow people to recommend new status options?
-
-import random
 import logging
 import os
+
+#from discord import app_commands   # TODO: Add a command to allow people to recommend new status options?
+import random
+
+import discord
 import yaml
+from discord.ext import commands, tasks
 
 log = logging.getLogger('discord.cogs')
 
@@ -28,7 +29,7 @@ class RandomStatus(commands.Cog):
     @tasks.loop(hours=1)
     async def update_status(self) -> None:
         # Get the list of possible statuses from the file
-        filename = f"./cogs/randomstatus_config/statuses.yaml"
+        filename = "cogs/randomstatus_config/statuses.yaml"
         if not os.path.isfile(filename):
             log.error(f"No file found. {filename} at {os.getcwd()}")
             return

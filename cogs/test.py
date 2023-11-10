@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # Discord bot: cogs/test.py
 
-import discord
-from discord.ext import commands
-from discord import app_commands
 import logging
 
+import discord
 from config import admin_guild
+from discord import app_commands
+from discord.ext import commands
 
 log = logging.getLogger('discord.cogs')
 
@@ -21,8 +21,8 @@ class TestCog(commands.Cog):
         try:
             await ctx.response.send_message("Test successful 👌")
             log.info(f"Command {ctx.command} was executed successfully in {ctx.guild.name}.")
-        except Exception as e:
-            await ctx.response.send_message(f"Command failed.", ephemeral=True)
+        except Exception:
+            await ctx.response.send_message("Command failed.", ephemeral=True)
 
 async def setup(bot) -> None:
     await bot.add_cog(TestCog(bot))

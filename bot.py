@@ -3,11 +3,10 @@
 
 import logging
 
+import aiohttp
+import config
 import discord
 from discord.ext import commands
-import aiohttp
-
-import config
 
 description = """
 Hello! I am DiscordBot.
@@ -55,7 +54,7 @@ class DiscordBot(commands.AutoShardedBot):
         for extension in initial_extensions:
             try:
                 await self.load_extension(extension)
-            except Exception as e:
+            except Exception:
                 log.exception('Failed to load extension %s.', extension)
 
         # Add the list of all connected guilds to the log

@@ -2,11 +2,11 @@
 # Loudfoot bot: cogs/chatgpt.py
 
 import logging
-from discord.ext import commands
-from discord import app_commands
-import openai
 
+import openai
 from config import openai_api_token
+from discord import app_commands
+from discord.ext import commands
 
 log = logging.getLogger('discord.cogs')
 class ChatGPTCog(commands.Cog):

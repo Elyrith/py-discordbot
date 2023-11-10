@@ -2,12 +2,11 @@
 # Loudfoot bot: cogs/thecatapi.py
 
 import logging
-import discord
-from discord.ext import commands
-from discord import app_commands
-import requests
 
 import config
+import requests
+from discord import app_commands
+from discord.ext import commands
 
 log = logging.getLogger('discord.cogs')
 

@@ -6,10 +6,9 @@
 import logging
 
 import discord
-from discord.ext import commands
-from discord import app_commands
-
 from config import admin_guild
+from discord import app_commands
+from discord.ext import commands
 
 log = logging.getLogger('discord.cogs')
 
@@ -27,7 +26,7 @@ class AdminCog(commands.Cog):
         try:
             await self.bot.load_extension(cog)
             await ctx.response.send_message(f"Cog {cog} **loaded** successfully. 👌", ephemeral=True)
-        except commands.ExtensionNotFound as e:
+        except commands.ExtensionNotFound:
             await ctx.response.send_message(f"Cog {cog} __not found__. 👎", ephemeral=True)
         except commands.ExtensionError as e:
             await ctx.response.send_message(f'{e.__class__.__name__}: {e}', ephemeral=True)
@@ -50,7 +49,7 @@ class AdminCog(commands.Cog):
             await self.bot.load_extension(cog)
             await ctx.response.send_message(f"Cog {cog} __loaded__ successfully. 👌", ephemeral=True)
             return
-        except commands.ExtensionAlreadyLoaded as e:
+        except commands.ExtensionAlreadyLoaded:
             try:
                 await self.bot.reload_extension(cog)
                 await ctx.response.send_message(f"Cog {cog} **reloaded** successfully. 👌", ephemeral=True)
@@ -90,8 +89,8 @@ class AdminCog(commands.Cog):
         try:
             await ctx.response.send_message("👍", ephemeral=True)
             await self.bot.close()
-        except:
-            await ctx.response.send_message(f"Unable to stop the bot for some reason.", ephemeral=True)
+        except Exception:
+            await ctx.response.send_message("Unable to stop the bot for some reason.", ephemeral=True)
 
     # Don't use this too much. There is rate-limiting on it and you will have issues.
     @app_commands.command()

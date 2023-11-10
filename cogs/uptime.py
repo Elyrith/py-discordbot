@@ -2,13 +2,13 @@
 # Discord bot: cogs/uptime.py
 
 import logging
-import discord
-from discord.ext import commands
-from discord import app_commands
-from process_uptime import getuptime
 import socket
 
+import discord
 from config import admin_guild
+from discord import app_commands
+from discord.ext import commands
+from process_uptime import getuptime
 
 log = logging.getLogger('discord.cogs')
 
