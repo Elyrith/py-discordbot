@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Discord bot: cogs/uptime.py
 
+import logging
 import discord
 from discord.ext import commands
 from discord import app_commands
@@ -8,6 +9,8 @@ from process_uptime import getuptime
 import socket
 
 from config import admin_guild
+
+log = logging.getLogger('discord.cogs')
 
 class UptimeCog(commands.Cog):
     """Uptime command."""

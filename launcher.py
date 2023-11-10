@@ -30,6 +30,7 @@ def setup_logging() -> None:
         max_bytes = 32 * 1024 * 1024  # 32 MiB
         logging.getLogger('discord').setLevel(logging.INFO)
         logging.getLogger('discord.http').setLevel(logging.WARNING)
+        logging.getLogger('discord.cogs').setLevel(logging.WARNING)
         logging.getLogger('discord.state').addFilter(RemoveNoise())
 
         log.setLevel(logging.INFO)

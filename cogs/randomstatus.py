@@ -10,7 +10,7 @@ import logging
 import os
 import yaml
 
-log = logging.getLogger(__name__)
+log = logging.getLogger('discord.cogs')
 
 class RandomStatus(commands.Cog):
     """Randomly changes the bot's status every so often."""

@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 # Loudfoot bot: cogs/chatgpt.py
 
+import logging
 from discord.ext import commands
 from discord import app_commands
 import openai
 
 from config import openai_api_token
 
+log = logging.getLogger('discord.cogs')
 class ChatGPTCog(commands.Cog):
     def __init__(self, bot, openai_api_token) -> None:
         self.bot = bot

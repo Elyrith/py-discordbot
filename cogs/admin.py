@@ -3,11 +3,15 @@
 
 # Note: Remember to use "cogs.<cogname>" when using load/unload/reload. Example: "!reload cogs.admin"
 
+import logging
+
 import discord
 from discord.ext import commands
 from discord import app_commands
 
 from config import admin_guild
+
+log = logging.getLogger('discord.cogs')
 
 class AdminCog(commands.Cog):
     """Admin-only commands that make the bot dynamic."""

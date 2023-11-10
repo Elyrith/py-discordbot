@@ -13,7 +13,7 @@ description = """
 Hello! I am DiscordBot.
 """
 
-log = logging.getLogger(__name__)
+log = logging.getLogger('discord')
 
 initial_extensions = (
     'cogs.admin',

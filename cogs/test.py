@@ -8,7 +8,7 @@ import logging
 
 from config import admin_guild
 
-log = logging.getLogger(__name__)
+log = logging.getLogger('discord.cogs')
 
 class TestCog(commands.Cog):
     """Various test commands."""

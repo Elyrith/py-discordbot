@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 # Loudfoot bot: cogs/thecatapi.py
 
+import logging
 import discord
 from discord.ext import commands
 from discord import app_commands
 import requests
 
 import config
+
+log = logging.getLogger('discord.cogs')
 
 class TheCatAPICog(commands.Cog):
     """TheCatAPI stuff."""
