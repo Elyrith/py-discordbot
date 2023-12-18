@@ -54,12 +54,12 @@ class DiscordBot(commands.AutoShardedBot):
         for extension in initial_extensions:
             try:
                 await self.load_extension(extension)
-            except Exception:
-                log.exception('Failed to load extension %s.', extension)
+            except Exception as e:
+                log.exception(f"Failed to load extension {extension}. {e}")
 
         # Add the list of all connected guilds to the log
         for guild in self.guilds:
-            log.info('Connected to guild: %s (ID: %s)', guild, guild.id)
+            log.info(f"Connected to guild: {guild} (ID: {guild.id})")
 
     @property
     def owner(self) -> discord.User:
@@ -68,10 +68,15 @@ class DiscordBot(commands.AutoShardedBot):
     async def on_ready(self) -> None:
         if not hasattr(self, 'uptime'):
             self.uptime = discord.utils.utcnow()
+
+            # It's not recommended to sync the command tree in on_ready because it can be called multiple times rather than just once when the bot loads. Everyone recommends having a sync command, but how do you implement a command if you don't sync it first? So, the sync commands are in the admin_guild's command tree, so we'll only sync those on_ready, so you can at least resync all using the command if you need to.
+            # Maybe the correct solution is to use a regular command rather than an app_command to do syncing.
             await self.tree.sync(guild=discord.Object(id=config.admin_guild))
-            await self.tree.sync()
+#            await self.tree.sync()
 
         log.info('Ready: %s (ID: %s)', self.user, self.user.id)
+        for guild in self.guilds:
+            log.info(f'Bot is in guild: {guild.name} (ID: {guild.id})')
 
     async def on_shard_resumed(self, shard_id: int) -> None:
         log.info('Shard ID %s has resumed...', shard_id)
