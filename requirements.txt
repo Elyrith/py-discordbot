@@ -1,6 +1,6 @@
 discord.py
 aiohttp
 click
-process_uptime
 requests
-openai
+process_uptime # For the uptime cog
+openai # For the chatgpt cog
