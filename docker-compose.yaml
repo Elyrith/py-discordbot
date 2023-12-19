@@ -1,34 +1,7 @@
-#secrets:
-#  dgb_db_password:
-#    file: ./secrets/dgb_db_password.txt
-
 services:
-#  db:
-#    image: mysql
-#    restart: always
-#    environment:
-#      MYSQL_RANDOM_ROOT_PASSWORD: yes
-#      MYSQL_DATABASE: dgb_db
-#      MYSQL_USER: dgb_user
-#      MYSQL_PASSWORD: dgb_pass
-##      MYSQL_PASSWORD: /run/secrets/gdb_db_password
-#    volumes:
-##      - ./mysql:/var/lib/mysql
-#      - ./initialization:/docker-entrypoint-initdb.d
-##    ports:
-##      - 3306:3306
-#    healthcheck:
-#      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 3
-
   app:
     build: .
     restart: always
     volumes:
       - ./cogs:/home/discordbot/cogs:ro
       - ./logs:/home/discordbot/logs:rw
-#    depends_on:
-#      db:
-#        condition: service_healthy
