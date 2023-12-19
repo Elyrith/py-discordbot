@@ -29,7 +29,7 @@ class RandomStatus(commands.Cog):
     @tasks.loop(hours=1)
     async def update_status(self) -> None:
         # Get the list of possible statuses from the file
-        filename = "cogs/randomstatus_config/statuses.yaml"
+        filename = "./cogs/randomstatus_config/statuses.yaml"
         if not os.path.isfile(filename):
             log.error(f"RandomStatus: No file found. {filename} at {os.getcwd()}")
             log.error("RandomStatus: No config file found.")
