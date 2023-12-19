@@ -1,0 +1,6 @@
+# Rename this file to be the guild ID
+---
+guild_name: "Guild Name" # This is just for humans to remember which guild this file is for.
+guild: 000000000000000000 # The guild ID.
+events_channel: 1111111111111111111 # Channel ID the bot will announce in.
+ping: "Event Ping" # Create a role in your server and add anyone who wants to be notified of events via @role_name.
