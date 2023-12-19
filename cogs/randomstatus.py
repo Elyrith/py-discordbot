@@ -11,7 +11,7 @@ import discord
 import yaml
 from discord.ext import commands, tasks
 
-log = logging.getLogger('discord.cogs')
+log = logging.getLogger('discord')
 
 class RandomStatus(commands.Cog):
     """Randomly changes the bot's status every so often."""

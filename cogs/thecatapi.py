@@ -8,7 +8,7 @@ import requests
 from discord import app_commands
 from discord.ext import commands
 
-log = logging.getLogger('discord.cogs')
+log = logging.getLogger('discord')
 
 class TheCatAPICog(commands.Cog):
     """TheCatAPI stuff."""

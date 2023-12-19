@@ -8,7 +8,7 @@ from config import openai_api_token
 from discord import app_commands
 from discord.ext import commands
 
-log = logging.getLogger('discord.cogs')
+log = logging.getLogger('discord')
 class ChatGPTCog(commands.Cog):
     def __init__(self, bot, openai_api_token) -> None:
         self.bot = bot

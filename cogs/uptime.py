@@ -10,7 +10,7 @@ from discord import app_commands
 from discord.ext import commands
 from process_uptime import getuptime
 
-log = logging.getLogger('discord.cogs')
+log = logging.getLogger('discord')
 
 class UptimeCog(commands.Cog):
     """Uptime command."""
