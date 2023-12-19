@@ -14,12 +14,6 @@ Hello! I am DiscordBot.
 
 log = logging.getLogger('discord')
 
-initial_extensions = (
-    'cogs.admin',
-    'cogs.uptime',
-    'cogs.thecatapi',
-)
-
 class DiscordBot(commands.AutoShardedBot):
     user: discord.ClientUser
     bot_app_info: discord.AppInfo
@@ -51,7 +45,7 @@ class DiscordBot(commands.AutoShardedBot):
         self.bot_app_info = await self.application_info()
         self.owner_id = self.bot_app_info.owner.id
 
-        for extension in initial_extensions:
+        for extension in config.initial_extensions:
             try:
                 await self.load_extension(extension)
             except Exception as e:

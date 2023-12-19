@@ -6,3 +6,11 @@ openai_api_token=TOKEN
 
 # This should be your token from https://thecatapi.com
 thecatapi_token=TOKEN
+
+# List of extensions to automatically start when the bot loads
+initial_extensions = (
+    'cogs.admin',
+    'cogs.uptime',
+    'cogs.randomstatus',
+    'cogs.thecatapi',
+)
