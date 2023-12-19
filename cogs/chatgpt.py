@@ -19,6 +19,7 @@ class ChatGPTCog(commands.Cog):
         """Access ChatGPT."""
         if not openai.api_key:
             await ctx.response.send_message('The config file does not have a value for openai_api_token.')
+            log.error("ChatGPT: No API key for OpenAI in the config file.")
             return
 
         response = openai.Completion.create(
@@ -31,8 +32,10 @@ class ChatGPTCog(commands.Cog):
         # Check if the response is empty or contains an error message
         if not text or text.startswith("Error:"):
             await ctx.response.send_message("I'm sorry, I could not generate a response.")
+            log.error("ChatGPT: Failed to get a response from OpenAI.")
         else:
             await ctx.response.send_message(text)
+            log.info("ChatGPT: Sucessfully got a response from OpenAI.")
 
 async def setup(bot) -> None:
     await bot.add_cog(ChatGPTCog(bot, openai_api_token))

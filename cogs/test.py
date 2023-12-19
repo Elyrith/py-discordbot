@@ -20,9 +20,10 @@ class TestCog(commands.Cog):
         """Test command."""
         try:
             await ctx.response.send_message("Test successful 👌")
-            log.info(f"Command {ctx.command} was executed successfully in {ctx.guild.name}.")
+            log.info(f"Test: Command {ctx.command} was executed successfully in {ctx.guild.name}.")
         except Exception:
             await ctx.response.send_message("Command failed.", ephemeral=True)
+            log.error(f"Test: Command {ctx.command} was failed in {ctx.guild.name}.")
 
 async def setup(bot) -> None:
     await bot.add_cog(TestCog(bot))

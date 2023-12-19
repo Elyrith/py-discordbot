@@ -26,10 +26,13 @@ class AdminCog(commands.Cog):
         try:
             await self.bot.load_extension(cog)
             await ctx.response.send_message(f"Cog {cog} **loaded** successfully. 👌", ephemeral=True)
+            log.info(f"Cog {cog} **loaded** successfully.")
         except commands.ExtensionNotFound:
             await ctx.response.send_message(f"Cog {cog} __not found__. 👎", ephemeral=True)
+            log.error(f"Tried to load {cog}, but it wasn't found.")
         except commands.ExtensionError as e:
             await ctx.response.send_message(f'{e.__class__.__name__}: {e}', ephemeral=True)
+            log.error(f"Tried to load {cog}, but failed.")
 
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=admin_guild))
@@ -38,8 +41,10 @@ class AdminCog(commands.Cog):
         try:
             await self.bot.unload_extension(cog)
             await ctx.response.send_message(f"Cog {cog} **unloaded** successfully. 👌", ephemeral=True)
+            log.info(f"Cog {cog} unloaded successfully.")
         except commands.ExtensionError as e:
             await ctx.response.send_message(f'{e.__class__.__name__}: {e}', ephemeral=True)
+            log.error(f"Tried to unload {cog}, but failed.")
 
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=admin_guild))
@@ -48,15 +53,19 @@ class AdminCog(commands.Cog):
         try:
             await self.bot.load_extension(cog)
             await ctx.response.send_message(f"Cog {cog} __loaded__ successfully. 👌", ephemeral=True)
+            log.info(f"Cog {cog} loaded successfully using the reload command.")
             return
         except commands.ExtensionAlreadyLoaded:
             try:
                 await self.bot.reload_extension(cog)
                 await ctx.response.send_message(f"Cog {cog} **reloaded** successfully. 👌", ephemeral=True)
+                log.info(f"Cog {cog} reloaded successfully.")
             except commands.ExtensionError as e:
                 await ctx.response.send_message(f'{e.__class__.__name__}: {e}', ephemeral=True)
+                log.error(f"Tried to reload {cog}, but failed.")
         except commands.ExtensionError as e:
             await ctx.response.send_message(f'{e.__class__.__name__}: {e}', ephemeral=True)
+            log.error(f"Tried to reload {cog}, but failed.")
 
     async def reload_or_load_extension(self, cog: str) -> None:
         try:
@@ -78,8 +87,10 @@ class AdminCog(commands.Cog):
                     await ctx.response.send_message(f"Failed to reload {cog}: {e}", ephemeral=True)
             await ctx.response.send_message("Cogs reloaded successfully. 👌", ephemeral=True)
             await self.bot.tree.sync()
+            log.info("All cogs unloaded successfully.")
         except Exception as e:
             await ctx.response.send_message(f"Failed to reload all cogs: {e}", ephemeral=True)
+            log.error("Tried to unload all cogs, but failed.")
 
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=admin_guild))
@@ -89,8 +100,10 @@ class AdminCog(commands.Cog):
         try:
             await ctx.response.send_message("👍", ephemeral=True)
             await self.bot.close()
-        except Exception:
-            await ctx.response.send_message("Unable to stop the bot for some reason.", ephemeral=True)
+            log.info("Bot stopped using the stop command.")
+        except Exception as e:
+            await ctx.response.send_message(f"Unable to stop the bot: {e}", ephemeral=True)
+            log.error("Tried to stop the bot, but failed.")
 
     # Don't use this too much. There is rate-limiting on it and you will have issues.
     @app_commands.command()
@@ -101,8 +114,10 @@ class AdminCog(commands.Cog):
         try:
             await self.bot.tree.sync()
             await ctx.response.send_message("Resync successful. Actual update may take up to an hour. 👌", ephemeral=True)
+            log.info("Resync successful.")
         except Exception as e:
             await ctx.response.send_message(f"Failed to resync: {e}", ephemeral=True)
+            log.error("Tried to resync commands, but failed.")
             return
 
     # Don't use this too much. There is rate-limiting on it and you will have issues.
@@ -117,8 +132,10 @@ class AdminCog(commands.Cog):
             await self.bot.tree.sync()
             
             await ctx.response.send_message("Command clear successful. Actual update may take up to an hour. 👌", ephemeral=True)
+            log.info("Command clear successful.")
         except Exception as e:
             await ctx.response.send_message(f"Failed to clear commands: {e}", ephemeral=True)
+            log.error("Tried to clear all commands, but failed.")
             return
 
 async def setup(bot) -> None:
