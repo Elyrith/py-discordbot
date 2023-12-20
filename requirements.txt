@@ -4,3 +4,4 @@ click
 requests
 process_uptime # For the uptime cog
 openai # For the chatgpt cog
+yaml # For gaming_announcement cog and events cog
