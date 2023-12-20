@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Discord bot: cogs/gaming.py
 
+import asyncio
 import logging
 import os
 from typing import List
@@ -49,6 +50,17 @@ class GamingAnnouncement(commands.Cog):
         except Exception as exception:
             await interaction.response.send_message("Command failed, sorry.", ephemeral=True)
             log.error(f"Gaming: {interaction.user.display_name} used /gaming but it failed. Message was: {message}. Error was: {exception}")
+
+        # Delete the message after the {hours} have passed, default to 1 hour if the value isn't an integer.
+        if not isinstance(hours, int):
+            hours = 1
+
+        try:
+            await asyncio.sleep(hours * 60 * 60)
+            await message.delete()
+            log.info(f"Gaming: Successfully auto-deleted a message I sent: {message}")
+        except Exception as e:
+            log.error(f"Gaming: Could not auto-delete a message I sent. {e.__class__.__name__}: {e}")
 
     @gaming.autocomplete(name="game")
     async def gaming_autocomplete_game(ctx: commands.Context, interaction: discord.Interaction, game: str) -> List[app_commands.Choice[str]]:
