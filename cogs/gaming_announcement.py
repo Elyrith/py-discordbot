@@ -84,5 +84,13 @@ class GamingAnnouncement(commands.Cog):
            for game in games if game.lower() in game.lower()
         ]
 
+    @gaming.autocomplete(name="hours")
+    async def gaming_autocomplete_hours(ctx: commands.Context, interaction: discord.Interaction, hours: str) -> List[app_commands.Choice[str]]:
+        hours_autocomplete = ["1"]
+        return [
+           app_commands.Choice(name=hours, value=hours)
+           for hours in hours_autocomplete if hours.lower() in hours.lower()
+        ]
+
 async def setup(bot) -> None:
     await bot.add_cog(GamingAnnouncement(bot))
