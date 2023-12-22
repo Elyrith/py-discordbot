@@ -1,10 +1,10 @@
-# Change this to your bot's Token. Don't confuse this with the bot's Secret..
+# Change this to your bot's Token. Don't confuse this with the bot's Secret.
 discordbot_token=TOKEN
 
-# This should be your OpenAI ChatGPT token
+# This should be your OpenAI ChatGPT token, if you use that module.
 openai_api_token=TOKEN
 
-# This should be your token from https://thecatapi.com
+# This should be your token from https://thecatapi.com, if you use that module.
 thecatapi_token=TOKEN
 
 # List of extensions to automatically start when the bot loads
