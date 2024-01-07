@@ -33,10 +33,10 @@ class TheCatAPICog(commands.Cog):
             caturl = catjson[0]["url"]
 
             await ctx.response.send_message("Prepare for this cuteness: " + caturl)
-            log.info(f"CatAPI: Command {ctx.command} was executed successfully in {ctx.guild.name}.")
+            log.info(f"CatAPI: Command {ctx.command.name} was executed successfully in {ctx.guild.name}.")
         except commands.ExtensionError as e:
             await ctx.response.send_message(f'{e.__class__.__name__}: {e}')
-            log.error(f"CatAPI: Command {ctx.command} failed in {ctx.guild.name}.")
+            log.error(f"CatAPI: Command {ctx.command.name} failed in {ctx.guild.name}.")
 
 
 async def setup(bot):
