@@ -73,15 +73,16 @@ class EventsCog(commands.Cog):
                     # Get the event start time.
                     event_start_time = event.start_time.astimezone()
                     event_start_time = event_start_time.strftime('%I:%M %p')
+                    event_timezone = event_start_time.strftime('%Z')
 
                     # Only if the event is scheduled.
                     if event.status == discord.EventStatus.scheduled or event.status == discord.EventStatus.active:
                         if hours_until_start == 24 or hours_until_start == 1:
-                            log.info(f"Message posted: [{event.name}]({event.url}) is starting in {hours_until_start} hours. ({event_start_time})")
-                            await channel.send(f"[{event.name}]({event.url}) is starting in {hours_until_start} hours. ({event_start_time})")
+                            log.info(f"Message posted: [{event.name}]({event.url}) is starting in {hours_until_start} hours. ({event_start_time} {event_timezone})")
+                            await channel.send(f"[{event.name}]({event.url}) is starting in {hours_until_start} hours. ({event_start_time} {event_timezone})")
                         elif hours_until_start == 0:
-                            log.info(f"Message posted: [{event.name}]({event.url}) is starting now. ({event_start_time})")
-                            await channel.send(f"[{event.name}]({event.url}) is starting now. ({event_start_time})")
+                            log.info(f"Message posted: [{event.name}]({event.url}) is starting now. ({event_start_time} {event_timezone})")
+                            await channel.send(f"[{event.name}]({event.url}) is starting now. ({event_start_time} {event_timezone})")
         except Exception as e:
             await log.error(f"Exception in post_about_events loop: {e}.")
 

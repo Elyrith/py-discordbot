@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Discord bot: cogs/admin.py
 
-# Note: Remember to use "cogs.<cogname>" when using load/unload/reload. Example: "!reload cogs.admin"
+# Note: Remember to use "cogs.<cogname>" when using load/unload/reload. Example: "/reload cogs.admin"
 
 import logging
 
@@ -19,6 +19,15 @@ class AdminCog(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
         self.sessions: set[int] = set()
+
+    # Prevent a command from being run by anyone other than a bot admin (currently only the bot owner)
+    async def admin_check(self, ctx: commands.Context) -> bool:
+        if ctx.user.id != self.bot.owner_id:
+            await ctx.response.send_message("Only the bot owner can use this command.", ephemeral=True)
+            log.error(f"User {ctx.user} tried to use {ctx.command.name}, but is not the bot owner.")
+            return False
+        else:
+            return True
 
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=admin_guild))
@@ -78,11 +87,6 @@ class AdminCog(commands.Cog):
     @app_commands.guilds(discord.Object(id=admin_guild))
     async def reload_all(self, ctx: commands.Context) -> None:
         """Reloads all currently-loaded cogs. (Bot owner only)"""
-        # Check if the command is being used by the bot owner
-        if ctx.user.id != self.bot.owner_id:
-            await ctx.response.send_message("Only the bot owner can use this command.", ephemeral=True)
-            log.error(f"User {ctx.user} tried to reload all cogs, but is not the bot owner.")
-            return
         try:
             loaded_cogs = list(self.bot.extensions.keys())
             for cog in loaded_cogs:
@@ -101,10 +105,8 @@ class AdminCog(commands.Cog):
     @app_commands.guilds(discord.Object(id=admin_guild))
     async def stop(self, ctx: commands.Context) -> None:
         """Stop the bot. (Bot owner only)"""
-        # Check if the command is being used by the bot owner
-        if ctx.user.id != self.bot.owner_id:
-            await ctx.response.send_message("Only the bot owner can use this command.", ephemeral=True)
-            log.error(f"User {ctx.user} tried to stop the bot, but is not the bot owner.")
+        # Check if the command is being used by a bot admin
+        if not self.admin_check(ctx):
             return
         try:
             await ctx.response.send_message("👍", ephemeral=True)
@@ -133,15 +135,14 @@ class AdminCog(commands.Cog):
 
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=admin_guild))
-    @commands.is_owner()
     async def resync(self, ctx: commands.Context) -> None:
-        """Resync all slash commands. Rate-limited."""
+        """Resync all slash commands. Rate-limited. (Bot owner only)"""
         await self.do_resync(ctx, self.bot, log)
 
     @commands.command(name='resync')
     @commands.is_owner()
     async def resync_old(self, ctx: commands.Context) -> None:
-        """Resync all slash commands. Rate-limited."""
+        """Resync all slash commands. Rate-limited. (Bot owner only)"""
         await self.do_resync(ctx, self.bot, log)
 
     # Don't use this too much. There is rate-limiting on it and you will have issues.
@@ -149,11 +150,6 @@ class AdminCog(commands.Cog):
     @app_commands.guilds(discord.Object(id=admin_guild))
     async def clear_commands(self, ctx: commands.Context) -> None:
         """Clear all slash commands. Rate-limited. (Bot owner only)"""
-        # Check if the command is being used by the bot owner
-        if ctx.user.id != self.bot.owner_id:
-            await ctx.response.send_message("Only the bot owner can use this command.", ephemeral=True)
-            log.error(f"User {ctx.user} tried to clear all bot commands, but is not the bot owner.")
-            return
         try:
             # Clear and resync all commands
             self.bot.tree.clear_commands()
