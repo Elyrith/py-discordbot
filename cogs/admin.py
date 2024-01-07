@@ -76,9 +76,13 @@ class AdminCog(commands.Cog):
 
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=admin_guild))
-    @commands.is_owner()
     async def reload_all(self, ctx: commands.Context) -> None:
-        """Reloads all currently-loaded cogs"""
+        """Reloads all currently-loaded cogs. (Bot owner only)"""
+        # Check if the command is being used by the bot owner
+        if ctx.user.id != self.bot.owner_id:
+            await ctx.response.send_message("Only the bot owner can use this command.", ephemeral=True)
+            log.error(f"User {ctx.user} tried to reload all cogs, but is not the bot owner.")
+            return
         try:
             loaded_cogs = list(self.bot.extensions.keys())
             for cog in loaded_cogs:
@@ -95,9 +99,13 @@ class AdminCog(commands.Cog):
 
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=admin_guild))
-    @commands.is_owner()
     async def stop(self, ctx: commands.Context) -> None:
-        """Stop the bot."""
+        """Stop the bot. (Bot owner only)"""
+        # Check if the command is being used by the bot owner
+        if ctx.user.id != self.bot.owner_id:
+            await ctx.response.send_message("Only the bot owner can use this command.", ephemeral=True)
+            log.error(f"User {ctx.user} tried to stop the bot, but is not the bot owner.")
+            return
         try:
             await ctx.response.send_message("👍", ephemeral=True)
             await self.bot.close()
@@ -139,9 +147,13 @@ class AdminCog(commands.Cog):
     # Don't use this too much. There is rate-limiting on it and you will have issues.
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=admin_guild))
-    @commands.is_owner()
     async def clear_commands(self, ctx: commands.Context) -> None:
-        """Clear all slash commands. Rate-limited."""
+        """Clear all slash commands. Rate-limited. (Bot owner only)"""
+        # Check if the command is being used by the bot owner
+        if ctx.user.id != self.bot.owner_id:
+            await ctx.response.send_message("Only the bot owner can use this command.", ephemeral=True)
+            log.error(f"User {ctx.user} tried to clear all bot commands, but is not the bot owner.")
+            return
         try:
             # Clear and resync all commands
             self.bot.tree.clear_commands()
