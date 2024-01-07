@@ -12,6 +12,7 @@ from discord.ext import commands
 
 log = logging.getLogger('discord')
 
+
 class AdminCog(commands.Cog):
     """Admin-only commands that make the bot dynamic."""
 
@@ -105,20 +106,35 @@ class AdminCog(commands.Cog):
             await ctx.response.send_message(f"Unable to stop the bot: {e}", ephemeral=True)
             log.error("Tried to stop the bot, but failed.")
 
-    # Don't use this too much. There is rate-limiting on it and you will have issues.
+    # Don't use the resync commands too much. There is rate-limiting on it and you will have issues.
+    async def do_resync(ctx, bot, log):
+        try:
+            await bot.tree.sync()
+            if isinstance(ctx, commands.Context):
+                await ctx.send("Resync successful. Actual update may take up to an hour. 👌")
+            else:
+                await ctx.response.send_message("Resync successful. Actual update may take up to an hour. 👌", ephemeral=True)
+            log.info("Resync successful.")
+        except Exception as e:
+            if isinstance(ctx, commands.Context):
+                await ctx.send(f"Failed to resync: {e}")
+            else:
+                await ctx.response.send_message(f"Failed to resync: {e}", ephemeral=True)
+            log.error("Tried to resync commands, but failed.")
+            return
+
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=admin_guild))
     @commands.is_owner()
     async def resync(self, ctx: commands.Context) -> None:
         """Resync all slash commands. Rate-limited."""
-        try:
-            await self.bot.tree.sync()
-            await ctx.response.send_message("Resync successful. Actual update may take up to an hour. 👌", ephemeral=True)
-            log.info("Resync successful.")
-        except Exception as e:
-            await ctx.response.send_message(f"Failed to resync: {e}", ephemeral=True)
-            log.error("Tried to resync commands, but failed.")
-            return
+        await self.do_resync(ctx, self.bot, log)
+
+    @commands.command(name='resync')
+    @commands.is_owner()
+    async def resync_old(self, ctx: commands.Context) -> None:
+        """Resync all slash commands. Rate-limited."""
+        await self.do_resync(ctx, self.bot, log)
 
     # Don't use this too much. There is rate-limiting on it and you will have issues.
     @app_commands.command()

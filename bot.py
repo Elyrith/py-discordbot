@@ -14,6 +14,7 @@ Hello! I am DiscordBot.
 
 log = logging.getLogger('discord')
 
+
 class DiscordBot(commands.AutoShardedBot):
     user: discord.ClientUser
     bot_app_info: discord.AppInfo
@@ -27,7 +28,7 @@ class DiscordBot(commands.AutoShardedBot):
 #            reactions=True,
         )
         super().__init__(
-            command_prefix='/',
+            command_prefix='!',
             description=description,
             pm_help=None,
             help_attrs=dict(hidden=True),
