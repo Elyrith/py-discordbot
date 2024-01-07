@@ -60,10 +60,13 @@ class EventsCog(commands.Cog):
                     # Calculate the number of hours until the event starts.
                     time_until_start = event.start_time - datetime.now(timezone.utc)
 
+                    # Calculate the total number of minutes until the event starts
+                    total_minutes_until_start = int(time_until_start.total_seconds() / 60)
+
                     # Only continue if there's an exact number of minutes until the event starts.
                     # We don't want to notify if there's 59 or 61 minutes remaining, only 60.
-                    hours_until_start = (time_until_start.days * 24) + int(time_until_start.seconds / 60 / 60)
-                    minutes_until_start = int(time_until_start.seconds / 60) % 60
+                    hours_until_start = total_minutes_until_start // 60
+                    minutes_until_start = total_minutes_until_start % 60
                     if not minutes_until_start == 0:
                         continue
 
