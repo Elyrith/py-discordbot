@@ -72,8 +72,8 @@ class EventsCog(commands.Cog):
 
                     # Get the event start time.
                     event_start_time = event.start_time.astimezone()
-                    event_start_time = event_start_time.strftime('%I:%M %p')
                     event_timezone = event_start_time.strftime('%Z')
+                    event_start_time = event_start_time.strftime('%I:%M %p')
 
                     # Only if the event is scheduled.
                     if event.status == discord.EventStatus.scheduled or event.status == discord.EventStatus.active:
