@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 # Discord bot: cogs/events.py
 
+# This module posts in a Discord channel when there's an event in the server.
+# The config files should be in cogs/events_config and named <guild_id>.yaml. It will skip any guild without a config file.
+
 # This requires the following intent: Guild
 
+import asyncio
 import logging
 import os
 from datetime import datetime, timezone
@@ -30,59 +34,62 @@ class EventsCog(commands.Cog):
         if not self.post_about_events.is_running():
             self.post_about_events.start()
 
+    async def event_posting(self, guild, channel):
+        # Fetch the scheduled events for the guild. We do this because guilds.scheduled_events doesn't get updated after the bot has started. The fetch is slow, though.
+        guild_events = await guild.fetch_scheduled_events()
+
+        for event in guild_events:
+
+            # Calculate the number of hours until the event starts.
+            time_until_start = event.start_time - datetime.now(timezone.utc)
+
+            # Calculate the total number of minutes until the event starts, rounding up.
+            total_minutes_until_start = int(time_until_start.total_seconds() // 60 + 1)
+
+            # Only continue if there's an exact number of minutes until the event starts.
+            # We don't want to notify if there's 59 or 61 minutes remaining, only 60.
+            hours_until_start = total_minutes_until_start // 60
+            minutes_until_start = total_minutes_until_start % 60
+            if not minutes_until_start < 2: # Ideally it's 0, but the guild.fetch_scheduled_events function can be really slow.
+                continue
+
+            # Get the event start time.
+            event_start_time = event.start_time.astimezone()
+            event_timezone = event_start_time.strftime('%Z')
+            event_start_time = event_start_time.strftime('X%I:%M %p').replace('X0','X').replace('X','')
+
+            # Only if the event is scheduled.
+            if event.status == discord.EventStatus.scheduled or event.status == discord.EventStatus.active:
+                if hours_until_start == 24 or hours_until_start == 1:
+                    log.info(f"Message posted: [{event.name}]({event.url}) is starting in {hours_until_start} hour(s). ({event_start_time} {event_timezone})")
+                    await channel.send(f"[{event.name}]({event.url}) is starting in {hours_until_start} hour(s). ({event_start_time} {event_timezone})")
+                elif hours_until_start == 0:
+                    log.info(f"Message posted: [{event.name}]({event.url}) is starting now. ({event_start_time} {event_timezone})")
+                    await channel.send(f"[{event.name}]({event.url}) is starting now. ({event_start_time} {event_timezone})")
+
     # Post about events at various intervals: 24, 1, and 0 hours remaining.
     @tasks.loop(minutes=1)
     async def post_about_events(self) -> None:
-        # If the current minute is not 00, 15, 30, or 45, return without doing anything
+        # Events can't be scheduled except at 00, 15, 30, and 45 minutes past the hour, so only run then.
         current_minute = datetime.now().minute
-        if current_minute not in [14, 29, 44, 59]:
+        if current_minute not in [00, 15, 30, 45]:
             return
 
-        # Otherwise, continue...
         try:
             for guild in self.bot.guilds:
                 # Find out if we should even bother getting the list of events. The fetch_scheduled_events function is really slow, so we only want to run it for guilds we don't have a config file for.
 
                 # Skip this guild if there's no config file for it.
-                guild_id = guild.id
-                guild_config = guild_configs.get(guild_id)
+                guild_config = guild_configs.get(guild.id)
                 if not guild_config:
                     continue
 
                 events_channel = guild_config.get("events_channel")
                 channel = self.bot.get_channel(events_channel)
 
-                # Fetch the scheduled events for the guild. We do this because guilds.scheduled_events doesn't get updated after the bot has started. The fetch is slow, though.
-                guild_events = await guild.fetch_scheduled_events()
+                # Do the actual posting ascynchronously because the fetch_scheduled_events function is so slow.
+                asyncio.create_task(self.event_posting(guild, channel))
 
-                for event in guild_events:
-
-                    # Calculate the number of hours until the event starts.
-                    time_until_start = event.start_time - datetime.now(timezone.utc)
-
-                    # Calculate the total number of minutes until the event starts
-                    total_minutes_until_start = int(time_until_start.total_seconds() / 60)
-
-                    # Only continue if there's an exact number of minutes until the event starts.
-                    # We don't want to notify if there's 59 or 61 minutes remaining, only 60.
-                    hours_until_start = total_minutes_until_start // 60
-                    minutes_until_start = total_minutes_until_start % 60
-                    if not minutes_until_start == 0:
-                        continue
-
-                    # Get the event start time.
-                    event_start_time = event.start_time.astimezone()
-                    event_timezone = event_start_time.strftime('%Z')
-                    event_start_time = event_start_time.strftime('%I:%M %p')
-
-                    # Only if the event is scheduled.
-                    if event.status == discord.EventStatus.scheduled or event.status == discord.EventStatus.active:
-                        if hours_until_start == 24 or hours_until_start == 1:
-                            log.info(f"Message posted: [{event.name}]({event.url}) is starting in {hours_until_start} hours. ({event_start_time} {event_timezone})")
-                            await channel.send(f"[{event.name}]({event.url}) is starting in {hours_until_start} hours. ({event_start_time} {event_timezone})")
-                        elif hours_until_start == 0:
-                            log.info(f"Message posted: [{event.name}]({event.url}) is starting now. ({event_start_time} {event_timezone})")
-                            await channel.send(f"[{event.name}]({event.url}) is starting now. ({event_start_time} {event_timezone})")
         except Exception as e:
             await log.error(f"Exception in post_about_events loop: {e}.")
 
