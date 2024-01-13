@@ -15,7 +15,7 @@ import discord
 import yaml
 from discord.ext import commands, tasks
 
-log = logging.getLogger('discord')
+log = logging.getLogger("discord")
 
 # Load YAML files once when bot starts
 guild_configs = {}
@@ -55,9 +55,9 @@ class EventsCog(commands.Cog):
 
             # Get the event start time.
             event_start_time = event.start_time.astimezone()
-            event_start_time = event_start_time.strftime('X%I:%M %p').replace('X0','X').replace('X','')
+            event_start_time = event_start_time.strftime("X%I:%M %p").replace("X0","X").replace("X","")
 
-            notify_role = discord.utils.get(channel.guild.roles, name=guild_configs[guild.id]['ping_role'])
+            notify_role = discord.utils.get(channel.guild.roles, name=guild_configs[guild.id]["ping_role"])
             print(notify_role.id)
 
             # Only if the event is scheduled.

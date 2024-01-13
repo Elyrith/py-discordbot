@@ -8,7 +8,8 @@ from config import admin_guild
 from discord import app_commands
 from discord.ext import commands
 
-log = logging.getLogger('discord')
+log = logging.getLogger("discord")
+
 
 class TestCog(commands.Cog):
     """Various test commands."""

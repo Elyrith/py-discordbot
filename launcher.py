@@ -13,10 +13,10 @@ from bot import DiscordBot
 
 class RemoveNoise(logging.Filter):
     def __init__(self) -> None:
-        super().__init__(name='discord.state')
+        super().__init__(name="discord.state")
 
     def filter(self, record: logging.LogRecord) -> bool:
-        if record.levelname == 'WARNING' and 'referencing an unknown' in record.msg:
+        if record.levelname == "WARNING" and "referencing an unknown" in record.msg:
             return False
         return True
 
@@ -28,13 +28,13 @@ def setup_logging() -> None:
         discord.utils.setup_logging()
         # __enter__
         max_bytes = 32 * 1024 * 1024  # 32 MiB
-        logging.getLogger('discord').setLevel(logging.INFO)
-        logging.getLogger('discord.state').addFilter(RemoveNoise())
+        logging.getLogger("discord").setLevel(logging.INFO)
+        logging.getLogger("discord.state").addFilter(RemoveNoise())
 
         log.setLevel(logging.INFO)
-        handler = RotatingFileHandler(filename='logs/DiscordBot.log', encoding='utf-8', mode='w', maxBytes=max_bytes, backupCount=5)
-        dt_fmt = '%Y-%m-%d %H:%M:%S'
-        fmt = logging.Formatter('[{asctime}] [{levelname:<7}] {name}: {message}', dt_fmt, style='{')
+        handler = RotatingFileHandler(filename="logs/DiscordBot.log", encoding="utf-8", mode="w", maxBytes=max_bytes, backupCount=5)
+        dt_fmt = "%Y-%m-%d %H:%M:%S"
+        fmt = logging.Formatter("[{asctime}] [{levelname:<7}] {name}: {message}", dt_fmt, style="{")
         handler.setFormatter(fmt)
         log.addHandler(handler)
 
@@ -51,7 +51,7 @@ async def run_bot():
     async with DiscordBot() as bot:
         await bot.start()
 
-@click.group(invoke_without_command=True, options_metavar='[options]')
+@click.group(invoke_without_command=True, options_metavar="[options]")
 @click.pass_context
 def main(ctx) -> None:
     """Launches the bot."""
@@ -59,5 +59,5 @@ def main(ctx) -> None:
         with setup_logging():
             asyncio.run(run_bot())
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

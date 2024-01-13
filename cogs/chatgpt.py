@@ -8,7 +8,9 @@ from config import openai_api_token
 from discord import app_commands
 from discord.ext import commands
 
-log = logging.getLogger('discord')
+log = logging.getLogger("discord")
+
+
 class ChatGPTCog(commands.Cog):
     def __init__(self, bot, openai_api_token) -> None:
         self.bot = bot
@@ -18,7 +20,7 @@ class ChatGPTCog(commands.Cog):
     async def chatgpt(self, ctx: commands.Context, *, prompt) -> None:
         """Access ChatGPT."""
         if not openai.api_key:
-            await ctx.response.send_message('The config file does not have a value for openai_api_token.')
+            await ctx.response.send_message("The config file does not have a value for openai_api_token.")
             log.error("ChatGPT: No API key for OpenAI in the config file.")
             return
 

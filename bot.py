@@ -8,11 +8,9 @@ import config
 import discord
 from discord.ext import commands
 
-description = """
-Hello! I am DiscordBot.
-"""
+description = """Hello! I am DiscordBot."""
 
-log = logging.getLogger('discord')
+log = logging.getLogger("discord")
 
 
 class DiscordBot(commands.AutoShardedBot):
@@ -28,7 +26,7 @@ class DiscordBot(commands.AutoShardedBot):
 #            reactions=True,
         )
         super().__init__(
-            command_prefix='!',
+            command_prefix="!",
             description=description,
             pm_help=None,
             help_attrs=dict(hidden=True),
@@ -61,7 +59,7 @@ class DiscordBot(commands.AutoShardedBot):
         return self.bot_app_info.owner
 
     async def on_ready(self) -> None:
-        if not hasattr(self, 'uptime'):
+        if not hasattr(self, "uptime"):
             self.uptime = discord.utils.utcnow()
 
             # It's not recommended to sync the command tree in on_ready because it can be called multiple times rather than just once when the bot loads. Everyone recommends having a sync command, but how do you implement a command if you don't sync it first? So, the sync commands are in the admin_guild's command tree, so we'll only sync those on_ready, so you can at least resync all using the command if you need to.
@@ -69,12 +67,12 @@ class DiscordBot(commands.AutoShardedBot):
             await self.tree.sync(guild=discord.Object(id=config.admin_guild))
 #            await self.tree.sync()
 
-        log.info('Ready: %s (ID: %s)', self.user, self.user.id)
+        log.info("Ready: %s (ID: %s)", self.user, self.user.id)
         for guild in self.guilds:
-            log.info(f'Bot is in guild: {guild.name} (ID: {guild.id})')
+            log.info(f"Bot is in guild: {guild.name} (ID: {guild.id})")
 
     async def on_shard_resumed(self, shard_id: int) -> None:
-        log.info('Shard ID %s has resumed...', shard_id)
+        log.info("Shard ID %s has resumed...", shard_id)
 
     async def on_message(self, message: discord.Message) -> None:
         if message.author.bot:
@@ -90,4 +88,4 @@ class DiscordBot(commands.AutoShardedBot):
 
     @property
     def config(self) -> None:
-        return __import__('config')
+        return __import__("config")
