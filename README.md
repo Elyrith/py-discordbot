@@ -3,17 +3,20 @@
 [![Python App](https://github.com/Elyrith/py-discordbot/actions/workflows/python-app.yml/badge.svg?branch=main)](https://github.com/Elyrith/py-discordbot/actions/workflows/python-app.yml)
 [![Docker Image CI](https://github.com/Elyrith/py-discordbot/actions/workflows/docker-image.yml/badge.svg?branch=main)](https://github.com/Elyrith/py-discordbot/actions/workflows/docker-image.yml)
 
-#### You will need either:
+## Your environement will need to be one of these
+
 1. Python and Pip installed on your computer, or
 1. Docker installed on your computer
 
-#### An outline of all steps required for this bot are:
+### Overview of steps
+
 1. Create your own server in Discord
 1. Create your Discord application (with a bot), and invite it to your server
 1. Run this code to start the bot, either in Python (option 1) or Docker (option 2)
 1. Testing your bot
 
-#### Good programming strategies this code uses:
+### Good programming strategies this code uses
+
 1. It pulls the configuration variables (like Discord bot client ID and token) so they can be kept secret and out of the Git repository
 1. It introduces cogs to let you make little modules that can be easily added, removed, and reloaded (when changed) without restarting the entire bot
 1. It has a test cog you can use to make your own. Copy it, rename it, and enjoy!
@@ -36,26 +39,27 @@
 ---
 
 ## Step 2: Create your Discord application (with a bot), and invite it to your server
+
 Summary: You will need to create a Discord application, then create a Discord bot within that application. That will give you the API data you'll need.
 
-1. To create your Discord application and bot, go to the following URL: https://discord.com/developers/applications/
+1. To create your Discord application and bot, go to the following URL: <https://discord.com/developers/applications/>
 
 1. Click "New Application" to create a new application
- 1. Give it a name and accept the agreements
+    1. Give it a name and accept the agreements
 
 1. Click on Bot in the menu on the left, then click Add Bot, and then click "Yes, do it!"
- 1. If you have 2-Factor Authentication enabled, it will ask you to pass a verification check here
+    1. If you have 2-Factor Authentication enabled, it will ask you to pass a verification check here
 
 1. You'll now see your bot's info, and there will be a "Copy" button for the token. Click on that "Copy" button and store that somewhere safe.
- 1. That is your bot's "token", so store that somewhere safe for later
+    1. That is your bot's "token", so store that somewhere safe for later
 
 1. Scroll down a little to the "Privileged Gateway Intents" section and enable the "Message Content Intent". Your bot will need that to read messages and respond to messages that are commands for it.
 
 1. The final step is to invite your bot to your server:
- 1. Click on OAuth2 again, then click "URL Generator"
- 1. Check the option that says "bot" (left side, 5th down), then nothing else
- 1. Scroll down and "Copy" the generated URL and paste it into the URL bar in a new tab
- 1. Login with your Discord credentials (if you aren't already logged in), then select your new server from the dropdown, and click "Authorize"
+    1. Click on OAuth2 again, then click "URL Generator"
+    1. Check the option that says "bot" (left side, 5th down), then nothing else
+    1. Scroll down and "Copy" the generated URL and paste it into the URL bar in a new tab
+    1. Login with your Discord credentials (if you aren't already logged in), then select your new server from the dropdown, and click "Authorize"
 
 ---
 
@@ -66,17 +70,17 @@ Summary: You will need to create a Discord application, then create a Discord bo
 1. Copy the config.py-example file and name the new file simply "config.py"
 
 1. Update the "discordbot_token" with the value from Step 2 earlier and save the file
- 1. You can leave the other values alone for now
+    1. You can leave the other values alone for now
 
 ### Option 1: Run it in Python
 
-4. Install the package requirements by running `pip install -r requirements.txt`
+1. Install the package requirements by running `pip install -r requirements.txt`
 
 1. Run the bot by running launcher.py (This is usually done by simply typing `python3 launcher.py` in the terminal/command prompt)
 
 ### Option 2: Run this code in Docker
 
-4. Make sure you have Docker and docker-compose installed
+1. Make sure you have Docker and docker-compose installed
 
 1. Run `docker-compose up -d`
 
