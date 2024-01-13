@@ -55,17 +55,19 @@ class EventsCog(commands.Cog):
 
             # Get the event start time.
             event_start_time = event.start_time.astimezone()
-            event_timezone = event_start_time.strftime('%Z')
             event_start_time = event_start_time.strftime('X%I:%M %p').replace('X0','X').replace('X','')
+
+            notify_role = discord.utils.get(channel.guild.roles, name=guild_configs[guild.id]['ping_role'])
+            print(notify_role.id)
 
             # Only if the event is scheduled.
             if event.status == discord.EventStatus.scheduled or event.status == discord.EventStatus.active:
                 if hours_until_start == 24 or hours_until_start == 1:
-                    log.info(f"Message posted: [{event.name}]({event.url}) is starting in {hours_until_start} hour(s). ({event_start_time} {event_timezone})")
-                    await channel.send(f"[{event.name}]({event.url}) is starting in {hours_until_start} hour(s). ({event_start_time} {event_timezone})")
+                    log.info(f"Message posted: [{event.name}]({event.url}) is starting in {hours_until_start} hour(s). <@&{notify_role.id}>")
+                    await channel.send(f"[{event.name}]({event.url}) is starting in {hours_until_start} hour(s). <@&{notify_role.id}>")
                 elif hours_until_start == 0:
-                    log.info(f"Message posted: [{event.name}]({event.url}) is starting now. ({event_start_time} {event_timezone})")
-                    await channel.send(f"[{event.name}]({event.url}) is starting now. ({event_start_time} {event_timezone})")
+                    log.info(f"Message posted: [{event.name}]({event.url}) is starting now. <@&{notify_role.id}>")
+                    await channel.send(f"[{event.name}]({event.url}) is starting now. <@&{notify_role.id}>")
 
     # Post about events at various intervals: 24, 1, and 0 hours remaining.
     @tasks.loop(minutes=1)
