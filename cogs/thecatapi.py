@@ -10,6 +10,7 @@ from discord.ext import commands
 
 log = logging.getLogger("discord")
 
+
 class TheCatAPICog(commands.Cog):
     """TheCatAPI stuff."""
 
@@ -37,7 +38,6 @@ class TheCatAPICog(commands.Cog):
         except commands.ExtensionError as e:
             await ctx.response.send_message(f"{e.__class__.__name__}: {e}")
             log.error(f"CatAPI: Command {ctx.command.name} failed in {ctx.guild.name}.")
-
 
 async def setup(bot):
     await bot.add_cog(TheCatAPICog(bot, config.thecatapi_token))

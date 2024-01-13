@@ -12,6 +12,7 @@ from process_uptime import getuptime
 
 log = logging.getLogger("discord")
 
+
 class UptimeCog(commands.Cog):
     """Uptime command."""
 
