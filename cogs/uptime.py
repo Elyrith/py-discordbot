@@ -10,7 +10,7 @@ from discord import app_commands
 from discord.ext import commands
 from process_uptime import getuptime
 
-log = logging.getLogger('discord')
+log = logging.getLogger("discord")
 
 class UptimeCog(commands.Cog):
     """Uptime command."""
@@ -33,7 +33,7 @@ class UptimeCog(commands.Cog):
             await ctx.response.send_message("Uptime: " + str(uptimeDays) + "d " + str(uptimeHours) + "h " + str(uptimeMinutes) + "m " + str(uptimeSeconds) + "s . \N{OK HAND SIGN}", ephemeral=True)
             log.info(f"Uptime: Command {ctx.command.name} was executed successfully in {ctx.guild.name}.")
         except commands.ExtensionError as e:
-            await ctx.response.send_message(f'{e.__class__.__name__}: {e}', ephemeral=True)
+            await ctx.response.send_message(f"{e.__class__.__name__}: {e}", ephemeral=True)
             log.error(f"Uptime: Command {ctx.command.name} failed in {ctx.guild.name}.")
 
 async def setup(bot):

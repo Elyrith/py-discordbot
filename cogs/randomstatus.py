@@ -11,7 +11,7 @@ import discord
 import yaml
 from discord.ext import commands, tasks
 
-log = logging.getLogger('discord')
+log = logging.getLogger("discord")
 
 # Load config file once when bot starts
 filename = "./cogs/randomstatus_config/statuses.yaml"
@@ -19,7 +19,7 @@ if not os.path.isfile(filename):
     log.error(f"RandomStatus: No config file found. {filename} at {os.getcwd()}")
 with open(filename, "r") as file:
     data = yaml.safe_load(file)
-    statuses = data['statuses']
+    statuses = data["statuses"]
 
 
 class RandomStatus(commands.Cog):

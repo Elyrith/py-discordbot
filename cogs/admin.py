@@ -10,7 +10,7 @@ from config import admin_guild
 from discord import app_commands
 from discord.ext import commands
 
-log = logging.getLogger('discord')
+log = logging.getLogger("discord")
 
 
 class AdminCog(commands.Cog):
@@ -41,7 +41,7 @@ class AdminCog(commands.Cog):
             await ctx.response.send_message(f"Cog {cog} __not found__. 👎", ephemeral=True)
             log.error(f"Tried to load {cog}, but it wasn't found.")
         except commands.ExtensionError as e:
-            await ctx.response.send_message(f'{e.__class__.__name__}: {e}', ephemeral=True)
+            await ctx.response.send_message(f"{e.__class__.__name__}: {e}", ephemeral=True)
             log.error(f"Tried to load {cog}, but failed.")
 
     @app_commands.command()
@@ -53,7 +53,7 @@ class AdminCog(commands.Cog):
             await ctx.response.send_message(f"Cog {cog} **unloaded** successfully. 👌", ephemeral=True)
             log.info(f"Cog {cog} unloaded successfully.")
         except commands.ExtensionError as e:
-            await ctx.response.send_message(f'{e.__class__.__name__}: {e}', ephemeral=True)
+            await ctx.response.send_message(f"{e.__class__.__name__}: {e}", ephemeral=True)
             log.error(f"Tried to unload {cog}, but failed.")
 
     @app_commands.command()
@@ -71,10 +71,10 @@ class AdminCog(commands.Cog):
                 await ctx.response.send_message(f"Cog {cog} **reloaded** successfully. 👌", ephemeral=True)
                 log.info(f"Cog {cog} reloaded successfully.")
             except commands.ExtensionError as e:
-                await ctx.response.send_message(f'{e.__class__.__name__}: {e}', ephemeral=True)
+                await ctx.response.send_message(f"{e.__class__.__name__}: {e}", ephemeral=True)
                 log.error(f"Tried to reload {cog}, but failed.")
         except commands.ExtensionError as e:
-            await ctx.response.send_message(f'{e.__class__.__name__}: {e}', ephemeral=True)
+            await ctx.response.send_message(f"{e.__class__.__name__}: {e}", ephemeral=True)
             log.error(f"Tried to reload {cog}, but failed.")
 
     async def reload_or_load_extension(self, cog: str) -> None:
