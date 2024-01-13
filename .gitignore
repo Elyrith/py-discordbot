@@ -2,4 +2,9 @@
 /config.py
 *.log
 *.pyc
-/mysql
+
+# Virtual environment stuff
+bin/
+lib/
+lib64/
+pyvenv.cfg
