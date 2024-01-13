@@ -13,6 +13,15 @@ from discord.ext import commands, tasks
 
 log = logging.getLogger('discord')
 
+# Load config file once when bot starts
+filename = "./cogs/randomstatus_config/statuses.yaml"
+if not os.path.isfile(filename):
+    log.error(f"RandomStatus: No config file found. {filename} at {os.getcwd()}")
+with open(filename, "r") as file:
+    data = yaml.safe_load(file)
+    statuses = data['statuses']
+
+
 class RandomStatus(commands.Cog):
     """Randomly changes the bot's status every so often."""
 
@@ -28,24 +37,13 @@ class RandomStatus(commands.Cog):
     # Update bot's status every so often.
     @tasks.loop(hours=1)
     async def update_status(self) -> None:
-        # Get the list of possible statuses from the file
-        filename = "./cogs/randomstatus_config/statuses.yaml"
-        if not os.path.isfile(filename):
-            log.error(f"RandomStatus: No file found. {filename} at {os.getcwd()}")
-            log.error("RandomStatus: No config file found.")
-            return
-
-        # Get a status and set it as the current status
         try:
-            with open(filename, "r") as file:
-                data = yaml.safe_load(file)
-                statuses = data['statuses']
-                # Get a random status from the array of statuses
-                status = random.choice(statuses)
-                await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=status))
-                log.info(f"RandomStatus: Changed bot status to \"{status}\".")
+            # Get a status and set it as the current status
+            status = random.choice(statuses)
+            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=status))
+            log.info(f"RandomStatus: Changed bot status to \"{status}\".")
         except Exception as e:
-            log.error(f'RandomStatus: {e.__class__.__name__}: {e}')
+            log.error(f"RandomStatus: {e.__class__.__name__}: {e}")
             return
 
     @update_status.before_loop
