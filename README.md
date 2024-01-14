@@ -3,7 +3,7 @@
 [![Python App](https://github.com/Elyrith/py-discordbot/actions/workflows/python-app.yml/badge.svg?branch=main)](https://github.com/Elyrith/py-discordbot/actions/workflows/python-app.yml)
 [![Docker Image CI](https://github.com/Elyrith/py-discordbot/actions/workflows/docker-image.yml/badge.svg?branch=main)](https://github.com/Elyrith/py-discordbot/actions/workflows/docker-image.yml)
 
-## Your environement will need to be one of these
+## Your environment will need to be one of these
 
 1. Python and Pip installed on your computer, or
 1. Docker installed on your computer
