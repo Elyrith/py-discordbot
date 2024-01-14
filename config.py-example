@@ -4,6 +4,16 @@
 # Change this to your bot's Token. Don't confuse this with the bot's Secret.
 discordbot_token=TOKEN
 
+# Some commands are only for bot administrators. Specify the server where the admin(s) are here.
+admin_guild = <guild_id_as_integer>
+
+# These roles in these servers are allowed to use admin commands in the admin cog. Use @everyone if everyone is an admin.
+admin_roles = {
+    <guild_id_as_integer>: {
+        "admin_role": "@everyone"
+    },
+}
+
 # List of extensions to automatically start when the bot loads
 initial_extensions = (
     'cogs.admin',
