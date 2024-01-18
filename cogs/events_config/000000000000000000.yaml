@@ -4,3 +4,4 @@ guild_name: "Guild Name" # This is just for humans to remember which guild this 
 guild: 000000000000000000 # The guild ID.
 events_channel: 1111111111111111111 # Channel ID the bot will announce in.
 ping_role: "Event Ping" # Create a role in your server and add anyone who wants to be notified of events via @role_name.
+announce_times: [0, 1, 24] # How many hours before the event to announce it. 0 means announce it when the event starts.
