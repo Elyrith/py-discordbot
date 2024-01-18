@@ -62,12 +62,12 @@ class EventsCog(commands.Cog):
 
             # Only if the event is scheduled.
             if event.status == discord.EventStatus.scheduled or event.status == discord.EventStatus.active:
-                if hours_until_start in guild_configs[guild.id]["announce_times"]:
-                    log.info(f"Message posted: [{event.name}]({event.url}) is starting in {hours_until_start} hour(s). <@&{notify_role.id}>")
-                    await channel.send(f"[{event.name}]({event.url}) is starting in {hours_until_start} hour(s). <@&{notify_role.id}>")
-                elif 0 in guild_configs[guild.id]["announce_times"] and hours_until_start == 0:
+                if 0 in guild_configs[guild.id]["announce_times"] and hours_until_start == 0:
                     log.info(f"Message posted: [{event.name}]({event.url}) is starting now. <@&{notify_role.id}>")
                     await channel.send(f"[{event.name}]({event.url}) is starting now. <@&{notify_role.id}>")
+                elif hours_until_start in guild_configs[guild.id]["announce_times"]:
+                    log.info(f"Message posted: [{event.name}]({event.url}) is starting in {hours_until_start} hour(s). <@&{notify_role.id}>")
+                    await channel.send(f"[{event.name}]({event.url}) is starting in {hours_until_start} hour(s). <@&{notify_role.id}>")
 
     # Post about events at various intervals: 24, 1, and 0 hours remaining.
     @tasks.loop(minutes=1)
