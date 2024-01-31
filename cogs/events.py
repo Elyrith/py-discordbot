@@ -34,14 +34,14 @@ class EventsCog(commands.Cog):
         if not self.post_about_events.is_running():
             self.post_about_events.start()
 
-    async def event_posting(self, guild, channel):
+    async def event_posting(self, guild, channel, current_time):
         # Fetch the scheduled events for the guild. We do this because guilds.scheduled_events doesn't get updated after the bot has started. The fetch is slow, though.
         guild_events = await guild.fetch_scheduled_events()
 
         for event in guild_events:
 
             # Calculate the number of hours until the event starts.
-            time_until_start = event.start_time - datetime.now(timezone.utc)
+            time_until_start = event.start_time - current_time
 
             # Calculate the total number of minutes until the event starts, rounding up.
             total_minutes_until_start = int(time_until_start.total_seconds() // 60 + 1)
@@ -50,7 +50,8 @@ class EventsCog(commands.Cog):
             # We don't want to notify if there's 59 or 61 minutes remaining, only 60.
             hours_until_start = total_minutes_until_start // 60
             minutes_until_start = total_minutes_until_start % 60
-            if not minutes_until_start < 2: # Ideally it's 0, but the guild.fetch_scheduled_events function can be really slow.
+            print(f"[{event.name}] Minutes until start: {minutes_until_start}.")
+            if not minutes_until_start == 0:
                 continue
 
             # Get the event start time.
@@ -58,7 +59,6 @@ class EventsCog(commands.Cog):
             event_start_time = event_start_time.strftime("X%I:%M %p").replace("X0","X").replace("X","")
 
             notify_role = discord.utils.get(channel.guild.roles, name=guild_configs[guild.id]["ping_role"])
-            print(notify_role.id)
 
             # Only if the event is scheduled.
             if event.status == discord.EventStatus.scheduled or event.status == discord.EventStatus.active:
@@ -73,8 +73,8 @@ class EventsCog(commands.Cog):
     @tasks.loop(minutes=1)
     async def post_about_events(self) -> None:
         # Events can't be scheduled except at 00, 15, 30, and 45 minutes past the hour, so only run then.
-        current_minute = datetime.now().minute
-        if current_minute not in [00, 15, 30, 45]:
+        current_time = datetime.now(timezone.utc)
+        if current_time.minute not in [00, 15, 30, 45]:
             return
 
         try:
@@ -90,7 +90,7 @@ class EventsCog(commands.Cog):
                 channel = self.bot.get_channel(events_channel)
 
                 # Do the actual posting ascynchronously because the fetch_scheduled_events function is so slow.
-                asyncio.create_task(self.event_posting(guild, channel))
+                asyncio.create_task(self.event_posting(guild, channel, current_time))
 
         except Exception as e:
             await log.error(f"Exception in post_about_events loop: {e}.")
