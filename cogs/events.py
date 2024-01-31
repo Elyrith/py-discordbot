@@ -50,7 +50,6 @@ class EventsCog(commands.Cog):
             # We don't want to notify if there's 59 or 61 minutes remaining, only 60.
             hours_until_start = total_minutes_until_start // 60
             minutes_until_start = total_minutes_until_start % 60
-            print(f"[{event.name}] Minutes until start: {minutes_until_start}.")
             if not minutes_until_start == 0:
                 continue
 
