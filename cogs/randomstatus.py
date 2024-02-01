@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-# Discord bot: cogs/random_status.py
+# Discord bot: cogs/randomstatus.py
 
 import logging
 import os
-
-#from discord import app_commands   # TODO: Add a command to allow people to recommend new status options?
 import random
 
 import discord
