@@ -21,7 +21,7 @@ class AdminCog(commands.Cog):
         self.sessions: set[int] = set()
 
     # Prevent a command from being run by anyone other than a bot admin (currently only the bot owner)
-    async def owner_check(self, ctx: commands.Context) -> bool:
+    async def verify_user_is_owner(self, ctx: commands.Context) -> bool:
         if ctx.user.id != self.bot.owner_id:
             await ctx.response.send_message("Only the bot owner can use this command.", ephemeral=True)
             log.error(f"User {ctx.user} tried to use {ctx.command.name}, but is not the bot owner.")
@@ -32,7 +32,7 @@ class AdminCog(commands.Cog):
     async def verify_user_is_admin(self, ctx: commands.Context) -> bool:
         if ctx.guild.id not in admin_roles:
             await ctx.response.send_message("This command is not allowed to be used in this server.", ephemeral=True)
-            log.error(f"{ctx.user.name} tried to use {ctx.command.name} in {ctx.guild.name}, but this command is not in the admin_roles in the config file.")
+            log.error(f"{ctx.user.name} tried to use {ctx.command.name} in {ctx.guild.name}, but this guild is not in the admin_roles in the config file.")
             return False
 
         admin_role = admin_roles[ctx.guild.id]["admin_role"]
@@ -122,7 +122,7 @@ class AdminCog(commands.Cog):
     @app_commands.guilds(discord.Object(id=admin_guild))
     async def stop(self, ctx: commands.Context) -> None:
         """Stop the bot. (Bot owner only)"""
-        if not await self.owner_check(ctx):
+        if not await self.verify_user_is_owner(ctx):
             return
         try:
             await ctx.response.send_message("👍", ephemeral=True)
