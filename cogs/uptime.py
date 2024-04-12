@@ -37,5 +37,17 @@ class UptimeCog(commands.Cog):
             await ctx.response.send_message(f"{e.__class__.__name__}: {e}", ephemeral=True)
             log.error(f"Uptime: Command {ctx.command.name} failed in {ctx.guild.name}.")
 
+    @app_commands.command()
+    @app_commands.guilds(discord.Object(id=admin_guild))
+    async def whattimeisit(self, ctx: commands.Context) -> None:
+        """Prints what time the bot thinks it is now."""
+        try:
+            timenow = getuptime()
+            await ctx.response.send_message("I think the time is: " + str(timenow) + " . \N{OK HAND SIGN}", ephemeral=True)
+            log.info(f"Uptime: Command {ctx.command.name} was executed successfully in {ctx.guild.name}.")
+        except commands.ExtensionError as e:
+            await ctx.response.send_message(f"{e.__class__.__name__}: {e}", ephemeral=True)
+            log.error(f"Uptime: Command {ctx.command.name} failed in {ctx.guild.name}.")
+
 async def setup(bot):
     await bot.add_cog(UptimeCog(bot))
