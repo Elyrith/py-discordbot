@@ -1,0 +1,3 @@
+# logs/.gitignore
+# This file exists to ensure that the logs/ directory is included in the git repository
+*.log
