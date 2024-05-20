@@ -9,6 +9,7 @@ from config import admin_guild
 from discord import app_commands
 from discord.ext import commands
 from process_uptime import getuptime
+import datetime
 
 log = logging.getLogger("discord")
 
@@ -42,7 +43,7 @@ class UptimeCog(commands.Cog):
     async def whattimeisit(self, ctx: commands.Context) -> None:
         """Prints what time the bot thinks it is now."""
         try:
-            timenow = getuptime()
+            timenow = datetime.datetime.now().strftime("%Y-%m-%d %I:%M %p")
             await ctx.response.send_message("I think the time is: " + str(timenow) + " . \N{OK HAND SIGN}", ephemeral=True)
             log.info(f"Uptime: Command {ctx.command.name} was executed successfully in {ctx.guild.name}.")
         except commands.ExtensionError as e:
