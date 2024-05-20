@@ -1,0 +1,31 @@
+# User this SystemD service file if you're running it as a SystemD System service, but as a particular user.
+# This will start automatically on system boot.
+
+# Usage: (as root)
+# Update WorkingDirectory to the directory where the launcher.py is located
+# cp discordbot@.service /etc/systemd/system/discordbot@<username>.service
+# systemctl daemon-reload
+# systemctl enable discordbot@<username>.service
+# systemctl start discordbot@<username>.service
+
+[Unit]
+Description=Discord Bot
+After=multi-user.target
+
+[Service]
+User=%i
+Type=simple
+Restart=always
+RestartSec=1
+WorkingDirectory=/path/to/py-discordbot/
+ExecStart=/usr/bin/python3 launcher.py
+
+# Hardening (borrowed from SyncThing's SystemD service file)
+ProtectSystem=full
+PrivateTmp=true
+SystemCallArchitectures=native
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
