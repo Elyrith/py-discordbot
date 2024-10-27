@@ -72,13 +72,41 @@ class Announce(commands.Cog):
         except Exception as e:
             log.error(f"Error in announce_autocomplete_activity: {e}")
 
-    @announce.autocomplete(name="hours")
-    async def announce_autocomplete_hours(ctx: commands.Context, interaction: discord.Interaction, hours: str) -> List[app_commands.Choice[str]]:
-        hours_autocomplete = ["1"]
-        return [
-           app_commands.Choice(name=hours, value=hours)
-           for hours in hours_autocomplete if hours.lower() in hours.lower()
-        ]
+#    @announce.autocomplete(name="hours")
+#    async def announce_autocomplete_hours(ctx: commands.Context, interaction: discord.Interaction, hours: str) -> List[app_commands.Choice[str]]:
+#        hours_autocomplete = ["1"]
+#        return [
+#           app_commands.Choice(name=hours, value=hours)
+#           for hours in hours_autocomplete if hours.lower() in hours.lower()
+#        ]
+
+    @app_commands.command()
+    async def anygame(self, interaction: discord.Interaction, hours: int) -> None:
+        """Announce that you're up for gaming for a few hours and welcome an invite."""
+
+        try:
+            # Skip this guild if there's no config file for it.
+            guild_id = interaction.guild_id
+            guild_config = guild_configs.get(guild_id)
+            if not guild_config:
+                await interaction.response.send_message("This server has not been configured to use this command. Let an admin know if you'd like them to configure it.", ephemeral=True)
+                log.info(f"Announce: {interaction.user.display_name} used /anygame in {interaction.guild.name} but the server has not been configured.")
+                return
+
+            # We've got everything now. Send output.
+            channel = self.bot.get_channel(guild_config.get("sessions_channel"))
+
+            # Get the role ID for the ping
+            notify_role = discord.utils.get(channel.guild.roles, name=guild_config.get("ping"))
+
+            # Send the message(s)
+            await channel.send(f"{interaction.user.display_name} is available to play something for {hours} hour(s). <@&{notify_role.id}>")
+            await interaction.response.send_message(f"Announced you're available to play something for {hours} hour(s) in channel <{channel.id}>.", ephemeral=True)
+            
+            log.info(f"Announce: {interaction.user.display_name} used /anygame successfully.")
+        except Exception as exception:
+            await interaction.response.send_message("Command failed, sorry.", ephemeral=True)
+            log.error(f"Announce: {interaction.user.display_name} used /anygame but it failed. Error was: {exception}")
 
 async def setup(bot) -> None:
     await bot.add_cog(Announce(bot))
