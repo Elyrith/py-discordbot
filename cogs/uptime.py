@@ -2,14 +2,27 @@
 # Discord bot: cogs/uptime.py
 
 import logging
+import os
 import socket
+from datetime import datetime
 
 import discord
+import psutil
 from config import admin_guild
 from discord import app_commands
 from discord.ext import commands
-from process_uptime import getuptime
-import datetime
+
+#from process_uptime import getuptime   # Keeping in case it comes back.
+
+# 2024-10-27 - process_uptime has disappeared, so here are the functions used from it.
+def getstarttime(pid=None):
+    if not pid:
+        pid = os.getpid()
+    p = psutil.Process(pid)
+    return datetime.fromtimestamp(p.create_time())
+
+def getuptime(pid=None):
+    return int((datetime.now() - getstarttime(pid)).total_seconds())
 
 log = logging.getLogger("discord")
 
@@ -32,7 +45,7 @@ class UptimeCog(commands.Cog):
             uptimeHours = (uptime // 60 // 60) % 24
             uptimeMinutes = (uptime // 60) % 60
             uptimeSeconds = uptime % 60
-            await ctx.response.send_message("Uptime: " + str(uptimeDays) + "d " + str(uptimeHours) + "h " + str(uptimeMinutes) + "m " + str(uptimeSeconds) + "s . \N{OK HAND SIGN}", ephemeral=True)
+            await ctx.response.send_message(f"Uptime: {str(uptimeDays)}d {str(uptimeHours)}h {str(uptimeMinutes)}m {str(uptimeSeconds)}s . \N{OK HAND SIGN}", ephemeral=True)
             log.info(f"Uptime: Command {ctx.command.name} was executed successfully in {ctx.guild.name}.")
         except commands.ExtensionError as e:
             await ctx.response.send_message(f"{e.__class__.__name__}: {e}", ephemeral=True)
