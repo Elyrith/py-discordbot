@@ -21,7 +21,7 @@ class RemoveNoise(logging.Filter):
         return True
 
 @contextlib.contextmanager
-def setup_logging() -> None:
+def setup_logging():
     log = logging.getLogger()
 
     try:
