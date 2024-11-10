@@ -48,7 +48,7 @@ class Announce(commands.Cog):
 
             # Send the message(s)
             await channel.send(f"{interaction.user.display_name} is planning to {activity} for {hours} hour(s). <@&{notify_role.id}>")
-            await interaction.response.send_message(f"Announced you're {activity} for {hours} hour(s) in channel <{channel.id}>.", ephemeral=True)
+            await interaction.response.send_message(f"Announced you're {activity} for {hours} hour(s) in channel <{channel.name}>.", ephemeral=True)
             
             log.info(f"Announce: {interaction.user.display_name} used /announce successfully.")
         except Exception as exception:
@@ -101,7 +101,7 @@ class Announce(commands.Cog):
 
             # Send the message(s)
             await channel.send(f"{interaction.user.display_name} is available to play something for {hours} hour(s). <@&{notify_role.id}>")
-            await interaction.response.send_message(f"Announced you're available to play something for {hours} hour(s) in channel <{channel.id}>.", ephemeral=True)
+            await interaction.response.send_message(f"Announced you're available to play something for {hours} hour(s) in channel <{channel.name}>.", ephemeral=True)
             
             log.info(f"Announce: {interaction.user.display_name} used /anygame successfully.")
         except Exception as exception:
