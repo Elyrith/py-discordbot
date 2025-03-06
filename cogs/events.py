@@ -68,7 +68,10 @@ class EventsCog(commands.Cog):
                     log.info(f"Message posted: [{event.name}]({event.url}) is starting in {hours_until_start} hour(s). <@&{notify_role.id}>")
                     await channel.send(f"[{event.name}]({event.url}) is starting in {hours_until_start} hour(s). <@&{notify_role.id}>")
 
-    # Post about events at various intervals: 24, 1, and 0 hours remaining.
+
+
+
+    # Post about events at various intervals. Use ./events_config/ files to configure your settings.
     @tasks.loop(minutes=1)
     async def post_about_events(self) -> None:
         # Events can't be scheduled except at 00, 15, 30, and 45 minutes past the hour, so only run then.
