@@ -21,9 +21,6 @@ class DiscordBot(commands.AutoShardedBot):
         allowed_mentions = discord.AllowedMentions(roles=False, everyone=False, users=True)
         intents = discord.Intents(
             guilds=True,
-#            members=True,
-#            emojis=True,
-#            reactions=True,
         )
         super().__init__(
             command_prefix="!",
