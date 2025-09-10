@@ -20,6 +20,12 @@ class DiscordBot(commands.AutoShardedBot):
     def __init__(self) -> None:
         allowed_mentions = discord.AllowedMentions(roles=False, everyone=False, users=True)
         intents = discord.Intents(
+            # Privileged intents
+            presences=True,
+            members=True,
+            message_content=True,
+ 
+            # Non-privileged intents
             guilds=True,
         )
         super().__init__(
