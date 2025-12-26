@@ -47,8 +47,8 @@ class Announce(commands.Cog):
             notify_role = discord.utils.get(channel.guild.roles, name=guild_config.get("ping"))
 
             # Send the message(s)
-            await channel.send(f"{interaction.user.display_name} is planning to {activity} for {hours} hour(s). <@&{notify_role.id}>")
-            await interaction.response.send_message(f"Announced you're {activity} for {hours} hour(s) in channel <{channel.name}>.", ephemeral=True)
+            await channel.send(f"{interaction.user.display_name} is planning to play {activity} for {hours} hour(s). <@&{notify_role.id}>")
+            await interaction.response.send_message(f"Announced you're playing {activity} for {hours} hour(s) in channel <{channel.name}>.", ephemeral=True)
             
             log.info(f"Announce: {interaction.user.display_name} used /announce successfully.")
         except Exception as exception:
