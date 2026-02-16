@@ -5,7 +5,7 @@ import logging
 
 import config
 import requests
-from discord import app_commands
+from discord import app_commands, Interaction
 from discord.ext import commands
 
 log = logging.getLogger("discord")
@@ -19,12 +19,12 @@ class TheCatAPICog(commands.Cog):
         self.thecatapi_token = thecatapi_token
 
     @app_commands.command()
-    async def gimmeacat(self, ctx: commands.Context) -> None:
+    async def gimmeacat(self, interaction: Interaction) -> None:
         """Gets and shows a cat photo."""
 
         # Check if the token is found
 #        if not config.thecatapi_token:
-#            await ctx.reply("The config file does not have a value for thecatapi_token.")
+#            await interaction.reply("The config file does not have a value for thecatapi_token.")
 #            return
 
         try:
@@ -33,11 +33,17 @@ class TheCatAPICog(commands.Cog):
             catjson = catrequest.json()
             caturl = catjson[0]["url"]
 
-            await ctx.response.send_message("Prepare for this cuteness: " + caturl)
-            log.info(f"CatAPI: Command {ctx.command.name} was executed successfully in {ctx.guild.name}.")
+            await interaction.response.send_message("Prepare for this cuteness: " + caturl)
+            log.info(
+                f"CatAPI: Command {getattr(interaction.command, 'name', 'unknown')} "
+                f"was executed successfully in {getattr(interaction.guild, 'name', 'DM')}."
+            )
         except commands.ExtensionError as e:
-            await ctx.response.send_message(f"{e.__class__.__name__}: {e}")
-            log.error(f"CatAPI: Command {ctx.command.name} failed in {ctx.guild.name}.")
+            await interaction.response.send_message(f"{e.__class__.__name__}: {e}")
+            log.error(
+                f"CatAPI: Command {getattr(interaction.command, 'name', 'unknown')} "
+                f"failed in {getattr(interaction.guild, 'name', 'DM')}."
+            )
 
 async def setup(bot):
     await bot.add_cog(TheCatAPICog(bot, config.thecatapi_token))
