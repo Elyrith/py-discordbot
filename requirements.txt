@@ -3,4 +3,4 @@ aiohttp
 click
 requests
 pyyaml # For any cog that uses YAML for config files
-psutil # For the uptime cog
+pytz # For the uptime cog
