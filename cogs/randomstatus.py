@@ -29,7 +29,7 @@ class RandomStatus(commands.Cog):
             self.update_status.start()
 
     # Make sure the loop gets stopped if the cog is unloaded.
-    def cog_unload(self):
+    async def cog_unload(self) -> None:
         self.update_status.cancel()
 
     # Update bot's status every so often.

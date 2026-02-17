@@ -8,7 +8,9 @@ from logging.handlers import RotatingFileHandler
 
 import click
 import discord
+
 from bot import DiscordBot
+from config import discordbot_token
 
 
 class RemoveNoise(logging.Filter):
@@ -49,7 +51,7 @@ def setup_logging():
 async def run_bot():
 #    log = logging.getLogger()
     async with DiscordBot() as bot:
-        await bot.start()
+        await bot.start(discordbot_token)
 
 @click.group(invoke_without_command=True, options_metavar="[options]")
 @click.pass_context

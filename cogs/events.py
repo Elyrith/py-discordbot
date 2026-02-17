@@ -95,11 +95,13 @@ class EventsCog(commands.Cog):
                 asyncio.create_task(self.event_posting(guild, channel, current_time))
 
         except Exception as e:
-            await log.error(f"Exception in post_about_events loop: {e}.")
+            log.exception(f"Exception in post_about_events loop: {e}.")
 
     # Make sure the loop gets stopped if the cog is unloaded.
-    def cog_unload(self):
+    async def cog_unload(self) -> None:
         self.post_about_events.cancel()
+        # Yield once to ensure the cancellation is processed in the event loop.
+        await asyncio.sleep(0)
 
     @post_about_events.before_loop
     async def before_post_about_events(self) -> None:

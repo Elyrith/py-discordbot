@@ -4,9 +4,10 @@
 import logging
 
 import discord
-from config import admin_guild
 from discord import app_commands
 from discord.ext import commands
+
+from config import admin_guild
 
 log = logging.getLogger("discord")
 

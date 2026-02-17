@@ -6,9 +6,10 @@
 import logging
 
 import discord
-from config import admin_guild, admin_roles
 from discord import app_commands
 from discord.ext import commands
+
+from config import admin_guild, admin_roles
 
 log = logging.getLogger("discord")
 
@@ -21,87 +22,97 @@ class AdminCog(commands.Cog):
         self.sessions: set[int] = set()
 
     # Prevent a command from being run by anyone other than a bot admin (currently only the bot owner)
-    async def verify_user_is_owner(self, ctx: commands.Context) -> bool:
+    async def verify_user_is_owner(self, ctx: discord.Interaction) -> bool:
         if ctx.user.id != self.bot.owner_id:
             await ctx.response.send_message("Only the bot owner can use this command.", ephemeral=True)
-            log.error(f"User {ctx.user} tried to use {ctx.command.name}, but is not the bot owner.")
+            command_name = getattr(getattr(ctx, "command", None), "name", "unknown")
+            log.error(f"User {ctx.user} tried to use {command_name}, but is not the bot owner.")
             return False
         else:
             return True
 
-    async def verify_user_is_admin(self, ctx: commands.Context) -> bool:
-        if ctx.guild.id not in admin_roles:
+    async def verify_user_is_admin(self, ctx: discord.Interaction) -> bool:
+        command_name = getattr(getattr(ctx, "command", None), "name", "unknown")
+        user = getattr(ctx, "user", None)
+        guild = getattr(ctx, "guild", None)
+        user_name = getattr(user, "name", None) or getattr(user, "display_name", "unknown")
+        guild_name = getattr(guild, "name", "unknown")
+
+        if not guild or guild.id not in admin_roles:
             await ctx.response.send_message("This command is not allowed to be used in this server.", ephemeral=True)
-            log.error(f"{ctx.user.name} tried to use {ctx.command.name} in {ctx.guild.name}, but this guild is not in the admin_roles in the config file.")
+            log.error(f"{user_name} tried to use {command_name} in {guild_name}, but this guild is not in the admin_roles in the config file.")
             return False
 
-        admin_role = admin_roles[ctx.guild.id]["admin_role"]
+        admin_role = admin_roles[guild.id]["admin_role"]
+        user_roles = getattr(user, "roles", [])
         user_is_admin = False
-        for user_role in ctx.user.roles:
-            if user_role.name == admin_role:
+        for user_role in user_roles:
+            if getattr(user_role, "name", None) == admin_role:
                 user_is_admin = True
                 break
         if not user_is_admin:
             await ctx.response.send_message("You do not have permission to run this command.", ephemeral=True)
-            log.error(f"{ctx.user.name} tried to use {ctx.command.name} in {ctx.guild.name}, but was not in the role '{admin_role}'. ({ctx.user.roles})")
+            log.error(f"{user_name} tried to use {command_name} in {guild_name}, but was not in the role '{admin_role}'. ({user_roles})")
             return False
 
         return True
 
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=admin_guild))
-    async def load(self, ctx: commands.Context, *, cog: str) -> None:
+    async def load(self, ctx: discord.Interaction, *, cog: str) -> None:
         """Loads a cog. (Admins only)"""
         if await self.verify_user_is_admin(ctx):
             try:
                 await self.bot.load_extension(cog)
                 await ctx.response.send_message(f"Cog {cog} **loaded** successfully. 👌", ephemeral=True)
-                log.info(f"Cog {cog} **loaded** successfully. ({ctx.user.name} in {ctx.guild.name})")
+                user_name = getattr(getattr(ctx, "user", None), "name", None) or getattr(getattr(ctx, "user", None), "display_name", "unknown")
+                guild_name = getattr(getattr(ctx, "guild", None), "name", "unknown")
+                log.info(f"Cog {cog} **loaded** successfully. ({user_name} in {guild_name})")
             except commands.ExtensionNotFound:
                 await ctx.response.send_message(f"Cog {cog} __not found__. 👎", ephemeral=True)
-                log.error(f"Tried to load {cog}, but it wasn't found. ({ctx.user.name} in {ctx.guild.name})")
+                log.error(f"Tried to load {cog}, but it wasn't found. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
             except commands.ExtensionError as e:
                 await ctx.response.send_message(f"{e.__class__.__name__}: {e}", ephemeral=True)
-                log.error(f"Tried to load {cog}, but failed. ({ctx.user.name} in {ctx.guild.name})")
+                log.error(f"Tried to load {cog}, but failed. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
 
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=admin_guild))
-    async def unload(self, ctx: commands.Context, *, cog: str) -> None:
+    async def unload(self, ctx: discord.Interaction, *, cog: str) -> None:
         """Unloads a cog. (Admins only)"""
         if await self.verify_user_is_admin(ctx):
             try:
                 await self.bot.unload_extension(cog)
                 await ctx.response.send_message(f"Cog {cog} **unloaded** successfully. 👌", ephemeral=True)
-                log.info(f"Cog {cog} unloaded successfully. ({ctx.user.name} in {ctx.guild.name})")
+                log.info(f"Cog {cog} unloaded successfully. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
             except commands.ExtensionError as e:
                 await ctx.response.send_message(f"{e.__class__.__name__}: {e}", ephemeral=True)
-                log.error(f"Tried to unload {cog}, but failed. ({ctx.user.name} in {ctx.guild.name})")
+                log.error(f"Tried to unload {cog}, but failed. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
 
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=admin_guild))
-    async def reload(self, ctx: commands.Context, *, cog: str) -> None:
+    async def reload(self, ctx: discord.Interaction, *, cog: str) -> None:
         """Reloads a cog, or loads it if it's not loaded. (Admins only)"""
         if await self.verify_user_is_admin(ctx):
             try:
                 await self.bot.load_extension(cog)
                 await ctx.response.send_message(f"Cog {cog} __loaded__ successfully. 👌", ephemeral=True)
-                log.info(f"Cog {cog} loaded successfully using the reload command. ({ctx.user.name} in {ctx.guild.name})")
+                log.info(f"Cog {cog} loaded successfully using the reload command. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
                 return
             except commands.ExtensionAlreadyLoaded:
                 try:
                     await self.bot.reload_extension(cog)
                     await ctx.response.send_message(f"Cog {cog} **reloaded** successfully. 👌", ephemeral=True)
-                    log.info(f"Cog {cog} reloaded successfully. ({ctx.user.name} in {ctx.guild.name})")
+                    log.info(f"Cog {cog} reloaded successfully. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
                 except commands.ExtensionError as e:
                     await ctx.response.send_message(f"{e.__class__.__name__}: {e}", ephemeral=True)
-                    log.error(f"Tried to reload {cog}, but failed. ({ctx.user.name} in {ctx.guild.name})")
+                    log.error(f"Tried to reload {cog}, but failed. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
             except commands.ExtensionError as e:
                 await ctx.response.send_message(f"{e.__class__.__name__}: {e}", ephemeral=True)
-                log.error(f"Tried to reload {cog}, but failed. ({ctx.user.name} in {ctx.guild.name})")
+                log.error(f"Tried to reload {cog}, but failed. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
 
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=admin_guild))
-    async def reload_all(self, ctx: commands.Context) -> None:
+    async def reload_all(self, ctx: discord.Interaction) -> None:
         """Reloads all currently-loaded cogs. (Admins only)"""
         if await self.verify_user_is_admin(ctx):
             try:
@@ -113,44 +124,44 @@ class AdminCog(commands.Cog):
                         await ctx.response.send_message(f"Failed to reload {cog}: {e}", ephemeral=True)
                 await ctx.response.send_message("Cogs reloaded successfully. 👌", ephemeral=True)
                 await self.bot.tree.sync()
-                log.info(f"All cogs unloaded successfully. ({ctx.user.name} in {ctx.guild.name})")
+                log.info(f"All cogs unloaded successfully. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
             except Exception as e:
                 await ctx.response.send_message(f"Failed to reload all cogs: {e}", ephemeral=True)
-                log.error(f"Tried to unload all cogs, but failed. ({ctx.user.name} in {ctx.guild.name})")
+                log.error(f"Tried to unload all cogs, but failed. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
 
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=admin_guild))
-    async def stop(self, ctx: commands.Context) -> None:
+    async def stop(self, ctx: discord.Interaction) -> None:
         """Stop the bot. (Bot owner only)"""
         if not await self.verify_user_is_owner(ctx):
             return
         try:
             await ctx.response.send_message("👍", ephemeral=True)
             await self.bot.close()
-            log.info(f"Bot stopped using the stop command. ({ctx.user.name} in {ctx.guild.name})")
+            log.info(f"Bot stopped using the stop command. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
         except Exception as e:
             await ctx.response.send_message(f"Unable to stop the bot: {e}", ephemeral=True)
-            log.error(f"Tried to stop the bot, but failed. ({ctx.user.name} in {ctx.guild.name})")
+            log.error(f"Tried to stop the bot, but failed. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
 
     # Don't use this too much. There is rate-limiting on it and you will have issues.
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=admin_guild))
-    async def resync(self, ctx: commands.Context) -> None:
+    async def resync(self, ctx: discord.Interaction) -> None:
         """Resync all slash commands. Rate-limited. (Admins only)"""
         if await self.verify_user_is_admin(ctx):
             try:
                 await self.bot.tree.sync()
                 await ctx.response.send_message("Resync successful. Actual update may take up to an hour. 👌", ephemeral=True)
-                log.info(f"Resync successful. ({ctx.user.name} in {ctx.guild.name})")
+                log.info(f"Resync successful. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
             except Exception as e:
                 await ctx.response.send_message(f"Failed to resync: {e}", ephemeral=True)
-                log.error(f"Tried to resync commands, but failed. ({ctx.user.name} in {ctx.guild.name})")
+                log.error(f"Tried to resync commands, but failed. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
                 return
 
     # Don't use this too much. There is rate-limiting on it and you will have issues.
     @app_commands.command()
     @app_commands.guilds(discord.Object(id=admin_guild))
-    async def clear_commands(self, ctx: commands.Context) -> None:
+    async def clear_commands(self, ctx: discord.Interaction) -> None:
         """Clear all slash commands. Rate-limited. (Admins only)"""
         if await self.verify_user_is_admin(ctx):
             try:
@@ -159,10 +170,10 @@ class AdminCog(commands.Cog):
                 await self.bot.tree.sync()
                 
                 await ctx.response.send_message("Command clear successful. Actual update may take up to an hour. 👌", ephemeral=True)
-                log.info(f"Command clear successful. ({ctx.user.name} in {ctx.guild.name})")
+                log.info(f"Command clear successful. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
             except Exception as e:
                 await ctx.response.send_message(f"Failed to clear commands: {e}", ephemeral=True)
-                log.error(f"Tried to clear all commands, but failed. ({ctx.user.name} in {ctx.guild.name})")
+                log.error(f"Tried to clear all commands, but failed. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
                 return
 
 async def setup(bot) -> None:

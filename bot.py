@@ -4,9 +4,10 @@
 import logging
 
 import aiohttp
-import config
 import discord
 from discord.ext import commands
+
+import config
 
 description = """Hello! I am DiscordBot."""
 
@@ -14,16 +15,15 @@ log = logging.getLogger("discord")
 
 
 class DiscordBot(commands.AutoShardedBot):
-    user: discord.ClientUser
     bot_app_info: discord.AppInfo
 
     def __init__(self) -> None:
         allowed_mentions = discord.AllowedMentions(roles=False, everyone=False, users=True)
         intents = discord.Intents(
             # Privileged intents
-            presences=True,
-            members=True,
-            message_content=True,
+           presences=True,
+           members=True,
+           message_content=True,
  
             # Non-privileged intents
             guilds=True,
@@ -31,8 +31,6 @@ class DiscordBot(commands.AutoShardedBot):
         super().__init__(
             command_prefix="!",
             description=description,
-            pm_help=None,
-            help_attrs=dict(hidden=True),
             chunk_guilds_at_startup=False,
             heartbeat_timeout=150.0,
             allowed_mentions=allowed_mentions,
@@ -62,15 +60,16 @@ class DiscordBot(commands.AutoShardedBot):
         return self.bot_app_info.owner
 
     async def on_ready(self) -> None:
-        if not hasattr(self, "uptime"):
-            self.uptime = discord.utils.utcnow()
+        if not hasattr(self, "startuptime"):
+            self.startuptime = discord.utils.utcnow()
 
             # It's not recommended to sync the command tree in on_ready because it can be called multiple times rather than just once when the bot loads. Everyone recommends having a sync command, but how do you implement a command if you don't sync it first? So, the sync commands are in the admin_guild's command tree, so we'll only sync those on_ready, so you can at least resync all using the command if you need to.
             # Maybe the correct solution is to use a regular command rather than an app_command to do syncing.
             await self.tree.sync(guild=discord.Object(id=config.admin_guild))
 #            await self.tree.sync()
 
-        log.info("Ready: %s (ID: %s)", self.user, self.user.id)
+        if self.user:
+            log.info("Ready: %s (ID: %s)", self.user, self.user.id)
         for guild in self.guilds:
             log.info(f"Bot is in guild: {guild.name} (ID: {guild.id})")
 
@@ -86,8 +85,8 @@ class DiscordBot(commands.AutoShardedBot):
         await super().close()
         await self.session.close()
 
-    async def start(self) -> None:
-        await super().start(config.discordbot_token, reconnect=True)
+    async def start(self, token: str, *, reconnect: bool = True) -> None:
+        await super().start(token, reconnect=reconnect)
 
     @property
     def config(self) -> None:

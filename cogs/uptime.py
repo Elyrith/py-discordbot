@@ -1,67 +1,53 @@
-#!/usr/bin/env python3
-# Discord bot: cogs/uptime.py
+# cogs/uptime.py
 
 import logging
-import os
 import socket
-from datetime import datetime
 
 import discord
-import psutil
-from config import admin_guild
-from discord import app_commands
+import pytz
+from discord import Interaction, app_commands
 from discord.ext import commands
-
-#from process_uptime import getuptime   # Keeping in case it comes back.
-
-# 2024-10-27 - process_uptime has disappeared, so here are the functions used from it.
-def getstarttime(pid=None):
-    if not pid:
-        pid = os.getpid()
-    p = psutil.Process(pid)
-    return datetime.fromtimestamp(p.create_time())
-
-def getuptime(pid=None):
-    return int((datetime.now() - getstarttime(pid)).total_seconds())
 
 log = logging.getLogger("discord")
 
 
 class UptimeCog(commands.Cog):
-    """Uptime command."""
+    """Uptime-related commands."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.sessions: set[int] = set()
         self.hostname = socket.gethostname()
 
-    @app_commands.command()
-    @app_commands.guilds(discord.Object(id=admin_guild))
-    async def uptime(self, ctx: commands.Context) -> None:
-        """Prints the bot uptime."""
+    @app_commands.command(name="uptime", description="Prints the bot uptime.")
+    async def uptime(self, interaction: Interaction):
         try:
-            uptime = getuptime()
-            uptimeDays = int(uptime // 60 // 60 // 24)
-            uptimeHours = (uptime // 60 // 60) % 24
-            uptimeMinutes = (uptime // 60) % 60
-            uptimeSeconds = uptime % 60
-            await ctx.response.send_message(f"Uptime: {str(uptimeDays)}d {str(uptimeHours)}h {str(uptimeMinutes)}m {str(uptimeSeconds)}s . \N{OK HAND SIGN}", ephemeral=True)
-            log.info(f"Uptime: Command {ctx.command.name} was executed successfully in {ctx.guild.name}.")
-        except commands.ExtensionError as e:
-            await ctx.response.send_message(f"{e.__class__.__name__}: {e}", ephemeral=True)
-            log.error(f"Uptime: Command {ctx.command.name} failed in {ctx.guild.name}.")
+            start_time = getattr(self.bot, "startuptime", None)
+            if start_time is None:
+                await interaction.response.send_message("Startup time is not set.", ephemeral=True)
+                return
+            uptime = discord.utils.utcnow() - start_time
+            d = uptime.days
+            h, rem = divmod(uptime.seconds, 3600)
+            m, s = divmod(rem, 60)
+            msg = f"Uptime: {d}d {h}h {m}m {s}s \N{OK HAND SIGN}"
+            await interaction.response.send_message(msg, ephemeral=True)
+            log.info("Uptime command ran successfully.")
+        except Exception as e:
+            await interaction.response.send_message(f"Error: {e}", ephemeral=True)
+            log.exception("Uptime command failed.")
 
-    @app_commands.command()
-    @app_commands.guilds(discord.Object(id=admin_guild))
-    async def whattimeisit(self, ctx: commands.Context) -> None:
-        """Prints what time the bot thinks it is now."""
+    @app_commands.command(name="whattimeisit", description="Returns the current time in Eastern Time (Toronto).")
+    async def whattimeisit(self, interaction: Interaction):
         try:
-            timenow = datetime.datetime.now().strftime("%Y-%m-%d %I:%M %p")
-            await ctx.response.send_message("I think the time is: " + str(timenow) + " . \N{OK HAND SIGN}", ephemeral=True)
-            log.info(f"Uptime: Command {ctx.command.name} was executed successfully in {ctx.guild.name}.")
-        except commands.ExtensionError as e:
-            await ctx.response.send_message(f"{e.__class__.__name__}: {e}", ephemeral=True)
-            log.error(f"Uptime: Command {ctx.command.name} failed in {ctx.guild.name}.")
+            eastern = pytz.timezone("America/Toronto")
+            now_utc = discord.utils.utcnow()
+            now_eastern = now_utc.astimezone(eastern)
+            time_str = now_eastern.strftime("%Y-%m-%d %I:%M %p %Z")
+            await interaction.response.send_message(f"I think the time is: {time_str} \N{OK HAND SIGN}", ephemeral=True)
+        except Exception as e:
+            await interaction.response.send_message(f"Error: {e}", ephemeral=True)
+            log.exception("whattimeisit command failed.")
 
-async def setup(bot):
+
+async def setup(bot: commands.Bot):
     await bot.add_cog(UptimeCog(bot))
