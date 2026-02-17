@@ -124,38 +124,44 @@ class Announce(commands.Cog):
     async def ping_role_add_me(self, interaction: discord.Interaction) -> None:
         """Add the user to the ping role, as defined by guild_configs[guild_id].ping in the config file for the server."""
 
-        guild_id = self.bot.get_guild(interaction.guild_id)
-        if not guild_id:
-            return
-
-        ping_role_name = guild_configs[guild_id].get("ping")
-
-        ping_role = get(guild_id.roles, name=ping_role_name)
-        if not ping_role:
-            await interaction.response.send_message(f"The configured ping role ({ping_role_name} does not exist on this server.", ephemeral=True)
-            log.info(f"User {interaction.user} attempted to use ping_role_add_me in guild {guild_id} but the ping role does not exist.")
-            return
-
-        member = interaction.user
-        if not isinstance(member, discord.Member):
-            member = guild_id.get_member(member.id)
-        if member is None:
-            await interaction.response.send_message(f"{interaction.user} not found in server {guild_id}.", ephemeral=True)
-            log.info(f"User {interaction.user} attempted to use ping_role_add_me in guild {guild_id} but was not found as a member.")
-            return
-
-        if any(r.name == ping_role_name for r in member.roles):
-            await interaction.response.send_message(f"You already have role {ping_role_name} on server {guild_id}.", ephemeral=True)
-            log.info(f"User {interaction.user} attempted to use ping_role_add_me in guild {guild_id} but is already in the ping role.")
-            return
-
         try:
-            await member.add_roles(ping_role, reason=f"{self.bot.user} adding user to {ping_role_name} role.")
-            await interaction.response.send_message(f"You have been added to the {ping_role.name} role!", ephemeral=True)
-            log.info(f"User {interaction.user} used ping_role_add_me in guild {guild_id} and was added to the ping role.")
-        except discord.Forbidden:
-            await interaction.response.send_message(f"I do not have permission to add you to the ping role. Please contact an administrator on {guild_id}.", ephemeral=True)
-            log.info(f"User {interaction.user} attempted to use ping_role_add_me in guild {guild_id} but the bot does not have permission to add roles on this server.")
+            guild_id = interaction.guild_id
+            print(guild_id)
+            if not guild_id:
+                return
+            guild = self.bot.get_guild(guild_id)
+
+            ping_role_name = guild_configs[guild_id].get("ping")
+
+            ping_role = get(guild.roles, name=ping_role_name)
+            if not ping_role:
+                await interaction.response.send_message(f"The configured ping role ({ping_role_name} does not exist on this server.", ephemeral=True)
+                log.info(f"User {interaction.user} attempted to use ping_role_add_me in guild {guild_id} but the ping role does not exist.")
+                return
+
+            member = interaction.user
+            if not isinstance(member, discord.Member):
+                member = guild.get_member(member.id)
+            if member is None:
+                await interaction.response.send_message(f"{interaction.user} not found in server {guild_id}.", ephemeral=True)
+                log.info(f"User {interaction.user} attempted to use ping_role_add_me in guild {guild_id} but was not found as a member.")
+                return
+
+            if any(r.name == ping_role_name for r in member.roles):
+                await interaction.response.send_message(f"You already have role {ping_role_name} on server {guild_id}.", ephemeral=True)
+                log.info(f"User {interaction.user} attempted to use ping_role_add_me in guild {guild_id} but is already in the ping role.")
+                return
+
+            try:
+                await member.add_roles(ping_role, reason=f"{self.bot.user} adding user to {ping_role_name} role.")
+                await interaction.response.send_message(f"You have been added to the {ping_role.name} role!", ephemeral=True)
+                log.info(f"User {interaction.user} used ping_role_add_me in guild {guild_id} and was added to the ping role.")
+            except discord.Forbidden:
+                await interaction.response.send_message(f"I do not have permission to add you to the ping role. Please contact an administrator on {guild_id}.", ephemeral=True)
+                log.info(f"User {interaction.user} attempted to use ping_role_add_me in guild {guild_id} but the bot does not have permission to add roles on this server.")
+        except Exception as exception:
+            await interaction.response.send_message("Command failed, sorry.", ephemeral=True)
+            log.error(f"Announce: {interaction.user.display_name} used /ping_role_add_me but it failed. Error was: {exception}")
 
 
     @app_commands.command()
@@ -164,39 +170,44 @@ class Announce(commands.Cog):
     async def ping_role_remove_me(self, interaction: discord.Interaction) -> None:
         """Remove the user from the ping role, as defined by guild_configs[guild_id].ping in the config file for the server."""
 
-        guild_id = self.bot.get_guild(interaction.guild_id)
-        if not guild_id:
-            return
-
-        ping_role_name = guild_configs[guild_id].get("ping")
-
-        ping_role = get(guild_id.roles, name=ping_role_name)
-        if not ping_role:
-            await interaction.response.send_message(f"The configured ping role ({ping_role_name} does not exist on this server.", ephemeral=True)
-            log.info(f"User {interaction.user} attempted to use ping_role_remove_me in guild {guild_id} but the ping role does not exist.")
-            return
-
-        member = interaction.user
-        if not isinstance(member, discord.Member):
-            member = guild_id.get_member(member.id)
-        if member is None:
-            await interaction.response.send_message(f"{interaction.user} not found in server {guild_id}.", ephemeral=True)
-            log.info(f"User {interaction.user} attempted to use ping_role_remove_me in guild {guild_id} but was not found as a member.")
-            return
-
-        if not any(r.name == ping_role_name for r in member.roles):
-            await interaction.response.send_message(f"You do not have role {ping_role_name} on server {guild_id}.", ephemeral=True)
-            log.info(f"User {interaction.user} attempted to use ping_role_remove_me in guild {guild_id} but is not in the ping role.")
-            return
-
         try:
-            await member.remove_roles(ping_role, reason=f"{self.bot.user} adding user to {ping_role_name} role.")
-            await interaction.response.send_message(f"You have been removed from the {ping_role.name} role!", ephemeral=True)
-            log.info(f"User {interaction.user} used ping_role_remove_me in guild {guild_id} and was removed from the ping role.")
-        except discord.Forbidden:
-            await interaction.response.send_message("I do not have permission to add you to the ping role. Please contact an administrator on {guild}.", ephemeral=True)
-            log.info(f"User {interaction.user} attempted to use ping_role_remove_me in guild {guild_id} but the bot does not have permission to add roles on this server.")
+            guild_id = interaction.guild_id
+            print(guild_id)
+            if not guild_id:
+                return
+            guild = self.bot.get_guild(guild_id)
 
+            ping_role_name = guild_configs[guild_id].get("ping")
+
+            ping_role = get(guild.roles, name=ping_role_name)
+            if not ping_role:
+                await interaction.response.send_message(f"The configured ping role ({ping_role_name} does not exist on this server.", ephemeral=True)
+                log.info(f"User {interaction.user} attempted to use ping_role_remove_me in guild {guild_id} but the ping role does not exist.")
+                return
+
+            member = interaction.user
+            if not isinstance(member, discord.Member):
+                member = guild.get_member(member.id)
+            if member is None:
+                await interaction.response.send_message(f"{interaction.user} not found in server {guild_id}.", ephemeral=True)
+                log.info(f"User {interaction.user} attempted to use ping_role_remove_me in guild {guild_id} but was not found as a member.")
+                return
+
+            if not any(r.name == ping_role_name for r in member.roles):
+                await interaction.response.send_message(f"You do not have role {ping_role_name} on server {guild_id}.", ephemeral=True)
+                log.info(f"User {interaction.user} attempted to use ping_role_remove_me in guild {guild_id} but is not in the ping role.")
+                return
+
+            try:
+                await member.remove_roles(ping_role, reason=f"{self.bot.user} adding user to {ping_role_name} role.")
+                await interaction.response.send_message(f"You have been removed from the {ping_role.name} role!", ephemeral=True)
+                log.info(f"User {interaction.user} used ping_role_remove_me in guild {guild_id} and was removed from the ping role.")
+            except discord.Forbidden:
+                await interaction.response.send_message("I do not have permission to add you to the ping role. Please contact an administrator on {guild}.", ephemeral=True)
+                log.info(f"User {interaction.user} attempted to use ping_role_remove_me in guild {guild_id} but the bot does not have permission to add roles on this server.")
+        except Exception as exception:
+            await interaction.response.send_message("Command failed, sorry.", ephemeral=True)
+            log.error(f"Announce: {interaction.user.display_name} used /ping_role_remove_me but it failed. Error was: {exception}")
 
 async def setup(bot) -> None:
     await bot.add_cog(Announce(bot))
