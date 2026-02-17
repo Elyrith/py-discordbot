@@ -20,10 +20,10 @@ for filename in os.listdir("./cogs/announce_config"):
     if filename == ".gitignore" or filename == "000000000000000000.yaml":
         continue # Ignore .gitignore and the template file.
     with open(f"./cogs/announce_config/{filename}", "r") as file:
-        guild_id = int(filename.split(".")[0])
-        guild_configs[guild_id] = yaml.safe_load(file)
-        if guild_configs[guild_id].get("ping"): # Only add guilds with a ping role configured to the list of guilds for the command.
-            guild_with_ping_role.append(guild_id)
+        yaml_guild_id = int(filename.split(".")[0])
+        guild_configs[yaml_guild_id] = yaml.safe_load(file)
+        if guild_configs[yaml_guild_id].get("ping"): # Only add guilds with a ping role configured to the list of guilds for the command.
+            guild_with_ping_role.append(yaml_guild_id)
 
 
 class Announce(commands.Cog):
@@ -37,7 +37,7 @@ class Announce(commands.Cog):
     async def announce(self, interaction: discord.Interaction, activity: str, hours: int) -> None:
         """Announce you're going to engage in an activity now."""
 
-        try:           
+        try:
             guild_config = guild_configs.get(interaction.guild_id)
             if not guild_config:
                 if not interaction.guild:
@@ -124,13 +124,13 @@ class Announce(commands.Cog):
     async def ping_role_add_me(self, interaction: discord.Interaction) -> None:
         """Add the user to the ping role, as defined by guild_configs[guild_id].ping in the config file for the server."""
 
-        guild = self.bot.get_guild(guild_id)
-        if not guild:
+        guild_id = self.bot.get_guild(interaction.guild_id)
+        if not guild_id:
             return
 
         ping_role_name = guild_configs[guild_id].get("ping")
 
-        ping_role = get(guild.roles, name=ping_role_name)
+        ping_role = get(guild_id.roles, name=ping_role_name)
         if not ping_role:
             await interaction.response.send_message(f"The configured ping role ({ping_role_name} does not exist on this server.", ephemeral=True)
             log.info(f"User {interaction.user} attempted to use ping_role_add_me in guild {guild_id} but the ping role does not exist.")
@@ -138,7 +138,7 @@ class Announce(commands.Cog):
 
         member = interaction.user
         if not isinstance(member, discord.Member):
-            member = guild.get_member(member.id)
+            member = guild_id.get_member(member.id)
         if member is None:
             await interaction.response.send_message(f"{interaction.user} not found in server {guild_id}.", ephemeral=True)
             log.info(f"User {interaction.user} attempted to use ping_role_add_me in guild {guild_id} but was not found as a member.")
@@ -154,7 +154,7 @@ class Announce(commands.Cog):
             await interaction.response.send_message(f"You have been added to the {ping_role.name} role!", ephemeral=True)
             log.info(f"User {interaction.user} used ping_role_add_me in guild {guild_id} and was added to the ping role.")
         except discord.Forbidden:
-            await interaction.response.send_message("I do not have permission to add you to the ping role. Please contact an administrator on {guild_id}.", ephemeral=True)
+            await interaction.response.send_message(f"I do not have permission to add you to the ping role. Please contact an administrator on {guild_id}.", ephemeral=True)
             log.info(f"User {interaction.user} attempted to use ping_role_add_me in guild {guild_id} but the bot does not have permission to add roles on this server.")
 
 
@@ -164,13 +164,13 @@ class Announce(commands.Cog):
     async def ping_role_remove_me(self, interaction: discord.Interaction) -> None:
         """Remove the user from the ping role, as defined by guild_configs[guild_id].ping in the config file for the server."""
 
-        guild = self.bot.get_guild(guild_id)
-        if not guild:
+        guild_id = self.bot.get_guild(interaction.guild_id)
+        if not guild_id:
             return
 
         ping_role_name = guild_configs[guild_id].get("ping")
 
-        ping_role = get(guild.roles, name=ping_role_name)
+        ping_role = get(guild_id.roles, name=ping_role_name)
         if not ping_role:
             await interaction.response.send_message(f"The configured ping role ({ping_role_name} does not exist on this server.", ephemeral=True)
             log.info(f"User {interaction.user} attempted to use ping_role_remove_me in guild {guild_id} but the ping role does not exist.")
@@ -178,7 +178,7 @@ class Announce(commands.Cog):
 
         member = interaction.user
         if not isinstance(member, discord.Member):
-            member = guild.get_member(member.id)
+            member = guild_id.get_member(member.id)
         if member is None:
             await interaction.response.send_message(f"{interaction.user} not found in server {guild_id}.", ephemeral=True)
             log.info(f"User {interaction.user} attempted to use ping_role_remove_me in guild {guild_id} but was not found as a member.")
@@ -194,7 +194,7 @@ class Announce(commands.Cog):
             await interaction.response.send_message(f"You have been removed from the {ping_role.name} role!", ephemeral=True)
             log.info(f"User {interaction.user} used ping_role_remove_me in guild {guild_id} and was removed from the ping role.")
         except discord.Forbidden:
-            await interaction.response.send_message("I do not have permission to add you to the ping role. Please contact an administrator on {guild_id}.", ephemeral=True)
+            await interaction.response.send_message("I do not have permission to add you to the ping role. Please contact an administrator on {guild}.", ephemeral=True)
             log.info(f"User {interaction.user} attempted to use ping_role_remove_me in guild {guild_id} but the bot does not have permission to add roles on this server.")
 
 
