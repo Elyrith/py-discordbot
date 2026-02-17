@@ -1,4 +1,4 @@
-# DiscordBot - A simple Discord bot
+# DiscordBot - Elyrith's Discord bot
 
 [![Python App](https://github.com/Elyrith/py-discordbot/actions/workflows/python-app.yml/badge.svg?branch=main)](https://github.com/Elyrith/py-discordbot/actions/workflows/python-app.yml)
 [![Docker Image CI](https://github.com/Elyrith/py-discordbot/actions/workflows/docker-image.yml/badge.svg?branch=main)](https://github.com/Elyrith/py-discordbot/actions/workflows/docker-image.yml)
@@ -85,21 +85,3 @@ Summary: You will need to create a Discord application, then create a Discord bo
 1. Run `docker-compose up -d`
 
  Either way, you should now see your bot as a user in your server. If you chose the "Create My Own" and "For me and my friends" options when creating your server, the bot will show up in the "general" text channel, and should be online.
-
----
-
-## Step 4: Testing your bot
-
-There are a few commands you can run to test if your bot is working. You can type them into a channel that the bot is in, or you can send the bot a direct message.
-
-1. !uptime
-
- This should have the bot tell you how long it's been online. This test ensures the uptime cog is working correctly.
-
-1. !load cogs.test
-
- This should load the "test" cog in the "cogs" folder. This test ensures the admin cog is working correctly.
-
-1. !test
-
- This should have the bot respond to your message with the "thumbsup" emoji, then reply to you with "Test successfuly", then respond to your message with the "ok_hand" emoji. This test ensures the test cog was loaded correctly and is working.
