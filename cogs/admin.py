@@ -167,15 +167,22 @@ class AdminCog(commands.Cog):
         if await self.verify_user_is_admin(ctx):
             try:
                 # Clear and resync all commands
-                self.bot.tree.clear_commands()
+                await ctx.response.send_message("clear_commands has been called. If successful, the bot will not be able to continue running this command after syncing, so there's no way to send a confirmation.", ephemeral=True)
+                log.info(f"clear_commands has been called. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
+                self.bot.tree.clear_commands(guild=None)
                 await self.bot.tree.sync()
+                
+                # Clear commands from all but the admin guild first. This script stops running when you clear the clear_commands command from the bot, so it has to be last.
                 for guild in self.bot.guilds:
+                    if guild.id == admin_guild:
+                        continue
+                    self.bot.tree.clear_commands(guild=guild)
                     await self.bot.tree.sync(guild=guild)
-                await ctx.response.send_message("Command clear successful. Actual update may take up to an hour. 👌", ephemeral=True)
-                log.info(f"Command clear successful. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
+                self.bot.tree.clear_commands(guild=admin_guild)
+                await self.bot.tree.sync(guild=admin_guild)
             except Exception as e:
                 await ctx.response.send_message(f"Failed to clear commands: {e}", ephemeral=True)
-                log.error(f"Tried to clear all commands, but failed. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
+                log.error(f"Tried to clear all commands, but failed. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')}) ({e})")
                 return
 
 async def setup(bot) -> None:
