@@ -122,8 +122,7 @@ class AdminCog(commands.Cog):
                         await self.bot.reload_extension(cog)
                     except Exception as e:
                         await ctx.response.send_message(f"Failed to reload {cog}: {e}", ephemeral=True)
-                await ctx.response.send_message("Cogs reloaded successfully. 👌", ephemeral=True)
-                await self.bot.tree.sync()
+                await ctx.response.send_message("Cogs reloaded successfully. Don't forget to /resync commands if you changed any. 👌", ephemeral=True)
                 log.info(f"All cogs unloaded successfully. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
             except Exception as e:
                 await ctx.response.send_message(f"Failed to reload all cogs: {e}", ephemeral=True)
@@ -151,6 +150,8 @@ class AdminCog(commands.Cog):
         if await self.verify_user_is_admin(ctx):
             try:
                 await self.bot.tree.sync()
+                for guild in self.bot.guilds:
+                    await self.bot.tree.sync(guild=guild)
                 await ctx.response.send_message("Resync successful. Actual update may take up to an hour. 👌", ephemeral=True)
                 log.info(f"Resync successful. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
             except Exception as e:
@@ -168,7 +169,8 @@ class AdminCog(commands.Cog):
                 # Clear and resync all commands
                 self.bot.tree.clear_commands()
                 await self.bot.tree.sync()
-                
+                for guild in self.bot.guilds:
+                    await self.bot.tree.sync(guild=guild)
                 await ctx.response.send_message("Command clear successful. Actual update may take up to an hour. 👌", ephemeral=True)
                 log.info(f"Command clear successful. ({getattr(getattr(ctx, 'user', None), 'name', None) or getattr(getattr(ctx, 'user', None), 'display_name', 'unknown')} in {getattr(getattr(ctx, 'guild', None), 'name', 'unknown')})")
             except Exception as e:
