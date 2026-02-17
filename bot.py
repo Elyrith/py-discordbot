@@ -36,7 +36,7 @@ class DiscordBot(commands.AutoShardedBot):
             allowed_mentions=allowed_mentions,
             intents=intents,
             enable_debug_events=False,
-            activity=discord.Activity(type=discord.ActivityType.listening, name="server fans"),
+            activity=discord.Activity(type=discord.ActivityType.listening, name="Responding to pings"),
         )
 
     async def setup_hook(self) -> None:
