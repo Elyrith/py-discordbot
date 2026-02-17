@@ -157,8 +157,8 @@ class Announce(commands.Cog):
                 await interaction.response.send_message(f"You have been added to the {ping_role.name} role!", ephemeral=True)
                 log.info(f"User {interaction.user} used ping_role_add_me in guild {guild_id} and was added to the ping role.")
             except discord.Forbidden:
-                await interaction.response.send_message(f"I do not have permission to add you to the ping role. Please contact an administrator on {guild_id}.", ephemeral=True)
-                log.info(f"User {interaction.user} attempted to use ping_role_add_me in guild {guild_id} but the bot does not have permission to add roles on this server.")
+                await interaction.response.send_message(f"I do not have permission to add you to the {ping_role_name} role. Please contact an administrator for this server.", ephemeral=True)
+                log.info(f"User {interaction.user} attempted to use ping_role_add_me in guild {guild_id} but the bot got a permission error.")
         except Exception as exception:
             await interaction.response.send_message("Command failed, sorry.", ephemeral=True)
             log.error(f"Announce: {interaction.user.display_name} used /ping_role_add_me but it failed. Error was: {exception}")
@@ -203,8 +203,8 @@ class Announce(commands.Cog):
                 await interaction.response.send_message(f"You have been removed from the {ping_role.name} role!", ephemeral=True)
                 log.info(f"User {interaction.user} used ping_role_remove_me in guild {guild_id} and was removed from the ping role.")
             except discord.Forbidden:
-                await interaction.response.send_message("I do not have permission to add you to the ping role. Please contact an administrator on {guild}.", ephemeral=True)
-                log.info(f"User {interaction.user} attempted to use ping_role_remove_me in guild {guild_id} but the bot does not have permission to add roles on this server.")
+                await interaction.response.send_message(f"I do not have permission to remove you to the {ping_role_name} role. Please contact an administrator for this server.", ephemeral=True)
+                log.info(f"User {interaction.user} attempted to use ping_role_add_me in guild {guild_id} but the bot got a permission error.")
         except Exception as exception:
             await interaction.response.send_message("Command failed, sorry.", ephemeral=True)
             log.error(f"Announce: {interaction.user.display_name} used /ping_role_remove_me but it failed. Error was: {exception}")
